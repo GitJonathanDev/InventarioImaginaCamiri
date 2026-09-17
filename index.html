@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clínica Dental Imagina - Gestión Cloud</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .bg-dental-blue { background-color: #004a99; }
+        .text-dental-blue { color: #004a99; }
+        .border-dental-blue { border-color: #004a99; }
+        .hover-dental-blue:hover { background-color: #003d80; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans">
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md border-t-8 border-blue-600">
+            <div class="text-center mb-8">
+                <div class="bg-blue-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-tooth text-4xl text-blue-600"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-slate-800">Dental Imagina</h1>
+                <p class="text-slate-500">Acceso al Panel de Gestión</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-600 ml-1">USUARIO</label>
+                    <input type="text" id="login-user" placeholder="AdminImagina" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="text-xs font-bold text-slate-600 ml-1">CONTRASEÑA</label>
+                    <input type="password" id="login-pass" placeholder="••••••••" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <button onclick="handleLogin()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg">Entrar al Sistema</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN -->
+    <div id="app-screen" class="hidden flex flex-col md:flex-row min-h-screen">
+        
+        <!-- Sidebar -->
+        <nav class="w-full md:w-72 bg-slate-900 text-white flex flex-col shadow-xl">
+            <div class="p-8 text-center border-b border-slate-800">
+                <div class="flex items-center justify-center gap-3">
+                    <i class="fas fa-tooth text-blue-400 text-2xl"></i>
+                    <h2 class="text-xl font-bold tracking-tight">Dental Imagina</h2>
+                </div>
+            </div>
+            <div class="flex flex-col p-4 space-y-2 flex-grow">
+                <button data-section="sec-inventory" class="nav-link p-4 rounded-xl flex items-center gap-4 bg-blue-600 text-white transition font-medium">
+                    <i class="fas fa-boxes-stacked w-6 text-center"></i> Inventario
+                </button>
+                <button data-section="sec-patients" class="nav-link p-4 rounded-xl flex items-center gap-4 text-slate-400 hover:bg-slate-800 hover:text-white transition font-medium">
+                    <i class="fas fa-user-plus w-6 text-center"></i> Registro Pacientes
+                </button>
+                <button data-section="sec-stats" class="nav-link p-4 rounded-xl flex items-center gap-4 text-slate-400 hover:bg-slate-800 hover:text-white transition font-medium">
+                    <i class="fas fa-chart-line w-6 text-center"></i> Estadísticas
+                </button>
+            </div>
+            <div class="p-4">
+                <button onclick="handleLogout()" class="w-full p-4 bg-slate-800 hover:bg-red-900 text-red-400 hover:text-white rounded-xl flex items-center justify-center gap-3 transition font-bold">
+                    <i class="fas fa-power-off"></i> Cerrar Sesión
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="flex-grow p-4 md:p-10">
+            
+            <!-- Inventory Section -->
+            <section id="sec-inventory" class="section space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 class="text-3xl font-black text-slate-800">📦 Control de Almacén</h2>
+                    <div class="text-sm text-slate-500 bg-white px-4 py-2 rounded-full shadow-sm border">Sincronizado en tiempo real</div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+                    <div class="md:col-span-2">
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Nombre del Material</label>
+                        <input type="text" id="prod-name" placeholder="Ej: Anestesia Lidocaína" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Cantidad</label>
+                        <input type="number" id="prod-qty" placeholder="0" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Vencimiento</label>
+                        <input type="date" id="prod-expiry" class="w-full p-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-slate-500 mb-1 block">Foto</label>
+                        <input type="file" id="prod-photo" class="text-xs w-full">
+                    </div>
+                    <button onclick="saveProduct()" class="md:col-span-5 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-md">Agregar al Inventario</button>
+                </div>
+
+                <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Dynamic Content -->
+                </div>
+            </section>
+
+            <!-- Patients Section -->
+            <section id="sec-patients" class="section hidden space-y-8">
+                <h2 class="text-3xl font-black text-slate-800">👥 Registro Diario de Pacientes</h2>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 max-w-3xl mx-auto">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                        <div>
+                            <p class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-venus-mars text-blue-500"></i> Género
+                            </p>
+                            <div class="flex gap-4">
+                                <label class="flex-1 flex items-center justify-center gap-3 p-4 border-2 rounded-2xl cursor-pointer hover:bg-blue-50 transition peer-checked:border-blue-600 has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+                                    <input type="radio" name="gender" value="M" class="w-4 h-4"> <span class="font-semibold">Hombre</span>
+                                </label>
+                                <label class="flex-1 flex items-center justify-center gap-3 p-4 border-2 rounded-2xl cursor-pointer hover:bg-pink-50 transition has-[:checked]:border-pink-600 has-[:checked]:bg-pink-50">
+                                    <input type="radio" name="gender" value="F" class="w-4 h-4"> <span class="font-semibold">Mujer</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                <i class="fas fa-child text-blue-500"></i> Etapa de Vida
+                            </p>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer hover:bg-blue-50 transition has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+                                    <input type="radio" name="age" value="niño" class="w-4 h-4"> <span class="text-sm font-semibold">Niño</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer hover:bg-blue-50 transition has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+                                    <input type="radio" name="age" value="joven" class="w-4 h-4"> <span class="text-sm font-semibold">Joven</span>
+                                </label>
+                                <label class="flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer hover:bg-blue-50 transition has-[:checked]:border-blue-600 has-[:checked]:bg-blue-50">
+                                    <input type="radio" name="age" value="adulto" class="w-4 h-4"> <span class="text-sm font-semibold">Adulto</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-center gap-4 mb-10 p-6 bg-slate-100 rounded-2xl border-2 border-dashed border-slate-300">
+                        <input type="checkbox" id="xray-check" class="w-6 h-6 rounded text-blue-600">
+                        <label for="xray-check" class="font-bold text-slate-700 text-lg">¿Se realizó Radiografía?</label>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <button onclick="addPatient('consulta')" class="bg-blue-600 text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center gap-3">
+                            <i class="fas fa-plus-circle"></i> Registro Consulta
+                        </button>
+                        <button onclick="addPatient('radiografia')" class="bg-slate-800 text-white py-5 rounded-2xl font-black text-xl shadow-lg hover:bg-slate-900 transition flex items-center justify-center gap-3">
+                            <i class="fas fa-x-ray"></i> Registro Radiografía
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section id="sec-stats" class="section hidden space-y-8">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <h2 class="text-3xl font-black text-slate-800">📊 Estadísticas de Atención</h2>
+                </div>
+                
+                <div class="flex flex-wrap gap-4 items-center bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                    <span class="text-sm font-bold text-slate-500 ml-2">Filtrar por:</span>
+                    <select id="stats-range" class="p-2 border rounded-lg bg-slate-50 focus:ring-2 focus:ring-blue-500 outline-none">
+                        <option value="day">📅 Hoy</option>
+                        <option value="week">🗓️ Esta Semana</option>
+                        <option value="month">📅 Este Mes</option>
+                        <option value="all">♾️ Todo el tiempo</option>
+                    </select>
+                    <button onclick="loadStats()" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">Actualizar Datos</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border-b-8 border-blue-600 text-center">
+                        <p class="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Pacientes Totales</p>
+                        <p id="stat-total" class="text-5xl font-black text-slate-800">0</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border-b-8 border-pink-500 text-center">
+                        <p class="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Distribución Género</p>
+                        <p id="stat-gender" class="text-lg font-bold text-slate-800 leading-relaxed">-</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border-b-8 border-yellow-500 text-center">
+                        <p class="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Rango de Edad</p>
+                        <p id="stat-age" class="text-sm font-bold text-slate-800 leading-relaxed">-</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border-b-8 border-indigo-600 text-center">
+                        <p class="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">Radiografías</p>
+                        <p id="stat-xrays" class="text-5xl font-black text-indigo-600">0</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        // =========================================================================
+        // CONFIGURACIÓN DE SUPABASE (REEMPLAZA ESTO)
+        // =========================================================================
+        const SUPABASE_URL = 'https://khifepnfvvykzjmyxxdg.supabase.co/rest/v1/';
+        const SUPABASE_KEY = 'sb_publishable_Ubtyp5PwW564Q0J5WlVRsg_RjTgjhMm';
+        // =========================================================================
+
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- Seguridad Simple (Frontend) ---
+        const VALID_USER = "AdminImagina";
+        const VALID_PASS = "ImaginaRoot333";
+
+        window.handleLogin = () => {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (user === VALID_USER && pass === VALID_PASS) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-screen').classList.remove('hidden');
+                initInventory();
+            } else {
+                alert("Credenciales incorrectas. Por favor verifica.");
+            }
+        };
+
+        window.handleLogout = () => {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('app-screen').classList.add('hidden');
+        };
+
+        // --- Navegación ---
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                const target = link.getAttribute('data-section');
+                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+                document.getElementById(target).classList.remove('hidden');
+                
+                document.querySelectorAll('.nav-link').forEach(l => {
+                    l.classList.remove('bg-blue-600', 'text-white');
+                    l.classList.add('text-slate-400');
+                });
+                link.classList.add('bg-blue-600', 'text-white');
+                link.classList.remove('text-slate-400');
+            });
+        });
+
+        // --- Módulo Inventario ---
+        async function initInventory() {
+            const { data, error } = await supabase.from('inventory').select('*').order('name');
+            if (error) return console.error(error);
+            renderInventory(data);
+        }
+
+        function renderInventory(products) {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = "";
+            products.forEach(item => {
+                list.innerHTML += `
+                    <div class="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex items-center justify-between group hover:shadow-md transition">
+                        <div class="flex items-center gap-4">
+                            <img src="${item.photo_url || 'https://via.placeholder.com/60'}" class="w-16 h-16 rounded-2xl object-cover shadow-sm">
+                            <div>
+                                <p class="font-bold text-slate-800 leading-tight">${item.name}</p>
+                                <p class="text-xs text-slate-400 mt-1">Venc: ${item.expiry || 'N/A'}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-2xl border">
+                            <button onclick="updateQty('${item.id}', ${item.quantity - 1})" class="w-8 h-8 bg-white text-red-500 rounded-lg shadow-sm hover:bg-red-50 transition">-</button>
+                            <span class="font-black text-slate-700 w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQty('${item.id}', ${item.quantity + 1})" class="w-8 h-8 bg-white text-green-500 rounded-lg shadow-sm hover:bg-green-50 transition">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        window.saveProduct = async () => {
+            const name = document.getElementById('prod-name').value;
+            const qty = document.getElementById('prod-qty').value;
+            const expiry = document.getElementById('prod-expiry').value;
+            const fileInput = document.getElementById('prod-photo');
+            
+            if (!name || !qty) return alert("Nombre y cantidad son obligatorios");
+
+            let photoUrl = "";
+            if (fileInput.files[0]) {
+                const file = fileInput.files[0];
+                const fileName = `${Date.now()}_${file.name}`;
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('product_photos')
+                    .upload(fileName, file);
+                
+                if (!uploadError) {
+                    const { data: urlData } = supabase.storage.from('product_photos').getPublicUrl(fileName);
+                    photoUrl = urlData.publicUrl;
+                }
+            }
+
+            const { error } = await supabase.from('inventory').insert([
+                { name, quantity: Number(qty), expiry, photo_url: photoUrl }
+            ]);
+
+            if (error) alert("Error al guardar: " + error.message);
+            else {
+                alert("Producto agregado!");
+                document.getElementById('prod-name').value = "";
+                document.getElementById('prod-qty').value = "";
+                initInventory();
+            }
+        };
+
+        window.updateQty = async (id, newQty) => {
+            if (newQty < 0) return;
+            await supabase.from('inventory').update({ quantity: newQty }).eq('id', id);
+            initInventory();
+        };
+
+        // --- Módulo Pacientes ---
+        window.addPatient = async (type) => {
+            const gender = document.querySelector(`input[name="gender"]:checked`)?.value;
+            const age = document.querySelector(`input[name="age"]:checked`)?.value;
+            const xray = document.getElementById('xray-check').checked;
+
+            if (!gender || !age) return alert("Por favor seleccione género y edad");
+
+            const { error } = await supabase.from('patients').insert([
+                { type, gender, age, xray, created_at: new Date().toISOString() }
+            ]);
+
+            if (error) alert("Error: " + error.message);
+            else {
+                alert("Paciente registrado exitosamente");
+                document.getElementById('xray-check').checked = false;
+            }
+        };
+
+        // --- Estadísticas ---
+        window.loadStats = async () => {
+            const range = document.getElementById('stats-range').value;
+            let query = supabase.from('patients').select('*');
+
+            // Filtro de fecha simple
+            if (range === 'day') {
+                const today = new Date().toISOString().split('T')[0];
+                query = query.gte('created_at', today);
+            }
+
+            const { data, error } = await query;
+            if (error) return alert("Error cargando datos");
+
+            let total = 0, women = 0, men = 0, kids = 0, youth = 0, adults = 0, xrays = 0;
+
+            data.forEach(p => {
+                total++;
+                if (p.gender === 'F') women++; else men++;
+                if (p.age === 'niño') kids++; else if (p.age === 'joven') youth++; else adults++;
+                if (p.xray) xrays++;
+            });
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-gender').innerText = `Mujeres: ${women} | Hombres: ${men}`;
+            document.getElementById('stat-age').innerText = `Niños: ${kids} | Jóvenes: ${youth} | Adultos: ${adults}`;
+            document.getElementById('stat-xrays').innerText = xrays;
+        };
+    </script>
+</body>
+</html>
