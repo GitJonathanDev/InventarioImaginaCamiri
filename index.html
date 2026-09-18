@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dental Imagina | Corporate ERP</title>
+    <title>Clínica Dental Imagina | ERP Corporativo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,27 +16,19 @@
             --brand-purple: #8A2BE2;
             --brand-dark: #4B0082;
             --brand-light: #F3E8FF;
-            --brand-accent: #06B6D4;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .bg-corporate-gradient { background: linear-gradient(135deg, #4B0082 0%, #8A2BE2 100%); }
         .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
-        .sidebar-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
         .sidebar-item.active { background: var(--brand-purple); color: white !important; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); }
         .btn-corporate { background: var(--brand-purple); transition: all 0.3s ease; }
         .btn-corporate:hover { background: var(--brand-dark); transform: translateY(-2px); }
-        .input-corporate { border: 1px solid #E2E8F0; transition: all 0.2s ease; }
-        .input-corporate:focus { border-color: var(--brand-purple); ring: 2px var(--brand-light); outline: none; }
         .status-critical { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
         .status-stable { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Mobile Optimization */
-        @media (max-width: 768px) {
-            .sidebar-collapsed { transform: translateX(-100%); }
-            .main-content-mobile { padding: 1rem; }
-        }
+        .sidebar-collapsed { transform: translateX(-100%); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-900">
@@ -44,19 +36,19 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="hidden flex items-center justify-center min-h-screen p-6 bg-corporate-gradient">
         <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center fade-in">
-            <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-24 mx-auto mb-8" alt="Dental Imagina Logo">
-            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Panel Administrativo</h1>
-            <p class="text-slate-500 mb-10 font-medium">Acceso restringido a personal autorizado</p>
+            <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-24 mx-auto mb-8" alt="Clínica Dental Imagina">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Acceso Corporativo</h1>
+            <p class="text-slate-500 mb-10 font-medium">Clínica Dental Imagina</p>
             <div class="space-y-6">
                 <div class="text-left">
                     <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Usuario</label>
-                    <input type="text" id="login-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-corporate">
+                    <input type="text" id="login-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
                 <div class="text-left">
                     <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Contraseña</label>
-                    <input type="password" id="login-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-corporate">
+                    <input type="password" id="login-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500">
                 </div>
-                <button onclick="handleLogin()" class="w-full btn-corporate text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Ingresar</button>
+                <button id="btn-login" class="w-full btn-corporate text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Ingresar al Sistema</button>
             </div>
         </div>
     </div>
@@ -71,52 +63,50 @@
                 <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Clínica Dental Imagina</span>
             </div>
             <div class="flex flex-col p-6 space-y-4 flex-grow">
-                <button data-section="sec-inventory" class="sidebar-item active p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-boxes-stacked w-6 text-center"></i> Gestión de Inventario
-                </button>
-                <button data-section="sec-patients" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
+                <div data-section="sec-inventory" class="sidebar-item active p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
+                    <i class="fas fa-warehouse w-6 text-center"></i> Gestión de Inventario
+                </div>
+                <div data-section="sec-patients" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
                     <i class="fas fa-user-nurse w-6 text-center"></i> Registro de Pacientes
-                </button>
-                <button data-section="sec-stats" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-chart-line w-6 text-center"></i> Analítica de Datos
-                </button>
+                </div>
+                <div data-section="sec-stats" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
+                    <i class="fas fa-chart-line w-6 text-center"></i> Analítica Corporativa
+                </div>
             </div>
             <div class="p-6">
-                <button onclick="handleLogout()" class="w-full p-4 bg-slate-800 hover:bg-red-900 text-red-400 hover:text-white rounded-2xl flex items-center justify-center gap-3 transition-all font-bold border border-slate-700">
-                    <i class="fas fa-sign-out-alt"></i> Salir del Sistema
+                <button id="btn-logout" class="w-full p-4 bg-slate-800 hover:bg-red-900 text-red-400 hover:text-white rounded-2xl flex items-center justify-center gap-3 transition-all font-bold border border-slate-700">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
         </aside>
 
-        <!-- Content -->
+        <!-- Main Content -->
         <main class="flex-grow p-4 md:p-12 overflow-y-auto bg-slate-50 relative">
-            <!-- Mobile Menu Toggle -->
-            <button onclick="toggleSidebar()" class="md:hidden absolute top-4 left-4 z-50 p-3 bg-slate-900 text-white rounded-xl shadow-lg">
+            <button id="mobile-toggle" class="md:hidden absolute top-4 left-4 z-50 p-3 bg-slate-900 text-white rounded-xl shadow-lg">
                 <i class="fas fa-bars"></i>
             </button>
 
-            <!-- Inventory Section -->
+            <!-- Inventory -->
             <section id="sec-inventory" class="section space-y-10 fade-in">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Almacén Corporativo</h2>
-                        <p class="text-slate-500 font-medium">Control de existencias, lotes y suministros</p>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Gestión de Inventario</h2>
+                        <p class="text-slate-500 font-medium">Control de suministros y auditoría de almacén</p>
                     </div>
                     <div class="flex flex-wrap gap-3">
-                        <button onclick="exportPDF()" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:bg-slate-700 transition flex items-center gap-2">
-                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        <button id="btn-export-pdf" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:bg-slate-700 transition flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i> Reporte PDF
                         </button>
-                        <button onclick="toggleModal('modal-product')" class="btn-corporate text-white px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center gap-2">
+                        <button id="btn-open-modal" class="btn-corporate text-white px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center gap-2">
                             <i class="fas fa-plus-circle"></i> Agregar Material
                         </button>
                     </div>
                 </div>
 
-                <!-- Professional Search and Filter -->
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border flex flex-col md:flex-row gap-4 items-center">
                     <div class="relative flex-grow w-full">
                         <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="search-inv" oninput="filterInventory()" placeholder="Buscar producto, SKU o categoría..." class="w-full pl-12 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition">
+                        <input type="text" id="search-inv" placeholder="Buscar producto, SKU o categoría..." class="w-full pl-12 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition">
                     </div>
                     <div class="flex gap-2 w-full md:w-auto">
                         <button onclick="filterStock('all')" class="px-4 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Todos</button>
@@ -125,49 +115,44 @@
                     </div>
                 </div>
 
-                <!-- Summary Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-box-open"></i></div>
+                        <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-box"></i></div>
                         <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Productos</p><p id="inv-total" class="text-3xl font-black">0</p></div>
                     </div>
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
                         <div class="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-triangle-exclamation"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alertas Stock</p><p id="inv-critical" class="text-3xl font-black">0</p></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alertas</p><p id="inv-critical" class="text-3xl font-black">0</p></div>
                     </div>
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
                         <div class="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-check-circle"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Suministros OK</p><p id="inv-ok" class="text-3xl font-black">0</p></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estables</p><p id="inv-ok" class="text-3xl font-black">0</p></div>
                     </div>
                 </div>
 
-                <!-- Professional Inventory Table -->
                 <div class="bg-white rounded-[2rem] shadow-sm border overflow-hidden">
                     <div class="overflow-x-auto">
                         <table class="w-full text-left">
                             <thead class="bg-slate-50 border-b border-slate-100">
                                 <tr>
                                     <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Producto</th>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Categoría</th>
                                     <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Stock</th>
                                     <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento</th>
                                     <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado</th>
                                     <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
-                                <!-- Rows load here -->
-                            </tbody>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Patients Section -->
+            <!-- Patients -->
             <section id="sec-patients" class="section hidden space-y-10 fade-in">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-4">Registro Clínico Profesional</h2>
-                    <p class="text-slate-500 font-medium">Sincronización de atenciones y diagnósticos preliminares</p>
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-4">Registro de Pacientes</h2>
+                    <p class="text-slate-500 font-medium">Control de flujo clínico y demografía</p>
                 </div>
                 <div class="bg-white p-12 rounded-[3rem] shadow-xl border border-slate-100 max-w-4xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -183,7 +168,7 @@
                             </div>
                         </div>
                         <div class="space-y-6">
-                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-user-graduate text-purple-600"></i> Rango Etario</p>
+                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-user-graduate text-purple-600"></i> Etapa de Vida</p>
                             <div class="grid grid-cols-3 gap-3">
                                 <label class="flex items-center justify-center gap-2 p-4 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
                                     <input type="radio" name="age" value="niño" class="w-4 h-4"> <span class="text-sm font-bold">Niño</span>
@@ -199,34 +184,34 @@
                     </div>
                     <div class="flex items-center justify-center gap-4 mb-12 p-8 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
                         <input type="checkbox" id="xray-check" class="w-6 h-6 rounded text-purple-600">
-                        <label for="xray-check" class="font-bold text-slate-700 text-xl">¿Se realizó Radiografía?</label>
+                        <label for="xray-check" class="font-bold text-slate-700 text-xl">¿Realizó Radiografía?</label>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <button onclick="addPatient('consulta')" class="bg-purple-600 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-purple-700 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                        <button id="btn-add-consulta" class="bg-purple-600 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-purple-700 transition-all transform active:scale-95 flex items-center justify-center gap-3">
                             <i class="fas fa-stethoscope"></i> Registrar Consulta
                         </button>
-                        <button onclick="addPatient('radiografia')" class="bg-slate-800 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-slate-900 transition-all transform active:scale-95 flex items-center justify-center gap-3">
+                        <button id="btn-add-radiografia" class="bg-slate-800 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-slate-900 transition-all transform active:scale-95 flex items-center justify-center gap-3">
                             <i class="fas fa-x-ray"></i> Registrar Radiografía
                         </button>
                     </div>
                 </div>
             </section>
 
-            <!-- Stats Section -->
+            <!-- Stats -->
             <section id="sec-stats" class="section hidden space-y-12 fade-in">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Analítica de Datos</h2>
-                        <p class="text-slate-500 font-medium">Métricas de flujo y demografía de pacientes</p>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Analítica Corporativa</h2>
+                        <p class="text-slate-500 font-medium">Métricas de desempeño y flujo de pacientes</p>
                     </div>
                     <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border">
                         <select id="stats-range" class="p-3 rounded-xl bg-slate-50 outline-none font-bold text-slate-600">
-                            <option value="day">📅 Hoy</option>
-                            <option value="week">🗓️ Esta Semana</option>
-                            <option value="month">📅 Este Mes</option>
-                            <option value="all">♾️ Histórico</option>
+                            <option value="day">Hoy</option>
+                            <option value="week">Semana</option>
+                            <option value="month">Mes</option>
+                            <option value="all">Histórico</option>
                         </select>
-                        <button onclick="loadStats()" class="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-purple-700 transition">Sincronizar</button>
+                        <button id="btn-sync-stats" class="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-purple-700 transition">Sincronizar</button>
                     </div>
                 </div>
 
@@ -251,7 +236,7 @@
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
-                        <h3 class="text-2xl font-black mb-8 text-slate-800">Distribución de Género</h3>
+                        <h3 class="text-2xl font-black mb-8 text-slate-800">Análisis de Género</h3>
                         <div class="h-[300px]"><canvas id="chartGender"></canvas></div>
                     </div>
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
@@ -268,7 +253,7 @@
         <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl p-12 fade-in">
             <div class="flex justify-between items-center mb-10">
                 <h3 class="text-3xl font-black text-slate-900">Registrar Material</h3>
-                <button onclick="toggleModal('modal-product')" class="text-slate-400 hover:text-slate-600 text-4xl">&times;</button>
+                <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600 text-4xl">&times;</button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div class="space-y-6">
@@ -277,70 +262,82 @@
                     <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Stock Mínimo (Alerta)</label><input type="number" id="prod-min" value="5" class="w-full p-4 border rounded-2xl input-corporate"></div>
                 </div>
                 <div class="space-y-6">
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fecha Vencimiento (Opcional)</label><input type="date" id="prod-expiry" class="w-full p-4 border rounded-2xl input-corporate"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fotografía del Producto</label><input type="file" id="prod-photo" class="w-full text-xs p-3 border rounded-2xl bg-slate-50"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Comentario / Nota</label><textarea id="prod-note" class="w-full p-4 border rounded-2xl input-corporate h-20"></textarea></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fecha Vencimiento (Opcional)</label><input type="date" id="prod-expiry" class="w-//p-4 border rounded-2xl input-corporate w-full"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fotografía Corporativa</label><input type="file" id="prod-photo" class="w-full text-xs p-3 border rounded-2xl bg-slate-50"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Observaciones</label><textarea id="prod-note" class="w-full p-4 border rounded-2xl input-corporate h-20"></textarea></div>
                 </div>
             </div>
-            <button onclick="saveProduct()" class="w-full mt-12 btn-corporate text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all">Guardar en Almacén</button>
+            <button id="btn-save-product" class="w-full mt-12 btn-corporate text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all">Guardar en Almacén</button>
         </div>
     </div>
 
     <script>
+        // =========================================================================
+        // CONFIGURACIÓN - REEMPLAZA CON TUS DATOS
+        // =========================================================================
         const SUPABASE_URL = 'https://khifepnfvvykzjmyxxdg.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoaWZlcG5mdnZ5a3pqbXl4eGRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTI3NzUsImV4cCI6MjEwNTIyODc3NX0.KrYsIMVeUmmYU2nd43Uj0N_YdOAvb1ATj8vKMw6UwJ8';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+        // =========================================================================
 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const VALID_USER = "AdminImagina";
         const VALID_PASS = "ImaginaRoot333";
-
         let allProducts = [];
 
+        // --- CONTROL DE SESIÓN ---
         window.onload = () => {
             if (localStorage.getItem('dental_auth') === 'true') {
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                initInventory();
+                showApp();
             } else {
                 document.getElementById('login-screen').classList.remove('hidden');
             }
         };
 
-        window.handleLogin = () => {
-            if (document.getElementById('login-user').value === VALID_USER && document.getElementById('login-pass').value === VALID_PASS) {
+        function showApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-screen').classList.remove('hidden');
+            initInventory();
+        }
+
+        document.getElementById('btn-login').addEventListener('click', () => {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            if (user === VALID_USER && pass === VALID_PASS) {
                 localStorage.setItem('dental_auth', 'true');
-                document.getElementById('login-screen').classList.add('hidden');
-                document.getElementById('app-screen').classList.remove('hidden');
-                initInventory();
+                showApp();
             } else { alert("Credenciales inválidas."); }
-        };
+        });
 
-        window.handleLogout = () => {
+        document.getElementById('btn-logout').addEventListener('click', () => {
             localStorage.removeItem('dental_auth');
-            document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('app-screen').classList.add('hidden');
-        };
+            location.reload();
+        });
 
-        window.toggleSidebar = () => {
-            document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
-        };
-
-        window.toggleModal = (id) => {
-            document.getElementById(id).classList.toggle('hidden');
-        };
-
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', () => {
-                const target = link.getAttribute('data-section');
+        // --- NAVEGACIÓN ---
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const target = item.getAttribute('data-section');
                 document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
                 document.getElementById(target).classList.remove('hidden');
-                document.querySelectorAll('.nav-link').forEach(l => { l.classList.remove('active'); l.classList.add('text-slate-400'); });
-                link.classList.add('active');
-                link.classList.remove('text-slate-400');
+                document.querySelectorAll('.sidebar-item').forEach(l => { l.classList.remove('active'); l.classList.add('text-slate-400'); });
+                item.classList.add('active');
+                item.classList.remove('text-slate-400');
                 if(window.innerWidth < 768) toggleSidebar();
             });
         });
 
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
+        }
+        document.getElementById('mobile-toggle').addEventListener('click', toggleSidebar);
+
+        // --- GESTIÓN DE MODAL ---
+        document.getElementById('btn-open-modal').addEventListener('click', () => toggleModal('modal-product'));
+        document.getElementById('btn-close-modal').addEventListener('click', () => toggleModal('modal-product'));
+        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
+
+        // --- INVENTARIO ---
         async function initInventory() {
             const { data } = await supabaseClient.from('inventario').select('*').order('nombre');
             allProducts = data || [];
@@ -351,12 +348,10 @@
             const tbody = document.getElementById('inventory-table-body');
             let total = 0, critical = 0, ok = 0;
             tbody.innerHTML = "";
-            
             products.forEach(item => {
                 total++;
                 const isLow = item.cantidad_actual <= (item.stock_minimo || 5);
                 if (isLow) critical++; else ok++;
-                
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition-all group">
                         <td class="p-6">
@@ -365,15 +360,14 @@
                                 <div class="font-bold text-slate-800">${item.nombre}</div>
                             </div>
                         </td>
-                        <td class="p-6 text-sm text-slate-500">${item.categoria || 'General'}</td>
                         <td class="p-6">
                             <div class="flex items-center gap-3">
-                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual - 1})" class="w-8 h-8 bg-white border rounded-lg text-red-500 hover:bg-red-50">-</button>
+                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual - 1})" class="w-8 h-8 bg-white border rounded-lg text-red-500">-</button>
                                 <span class="font-black w-8 text-center">${item.cantidad_actual}</span>
-                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual + 1})" class="w-8 h-8 bg-white border rounded-lg text-green-500 hover:bg-green-50">+</button>
+                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual + 1})" class="w-8 h-8 bg-white border rounded-lg text-green-500">+</button>
                             </div>
                         </td>
-                        <td class="p-6 text-sm text-slate-500">${item.fecha_vencimiento || 'S/V'}</td>
+                        <td class="p-6 text-sm text-slate-500">${item.fecha_vencimiento || 'No aplica'}</td>
                         <td class="p-6">
                             <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${isLow ? 'status-critical' : 'status-stable'}">
                                 ${isLow ? 'Crítico' : 'Estable'}
@@ -392,7 +386,7 @@
 
         window.filterInventory = () => {
             const term = document.getElementById('search-inv').value.toLowerCase();
-            const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(term) || (p.categoria && p.categoria.toLowerCase().includes(term)));
+            const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(term));
             renderInventory(filtered);
         };
 
@@ -402,7 +396,7 @@
             else if(type === 'high') renderInventory(allProducts.filter(p => p.cantidad_actual > (p.stock_minimo || 5)));
         };
 
-        window.saveProduct = async () => {
+        document.getElementById('btn-save-product').addEventListener('click', async () => {
             const name = document.getElementById('prod-name').value;
             const qty = document.getElementById('prod-qty').value;
             const min = document.getElementById('prod-min').value;
@@ -419,13 +413,13 @@
                 if (!uploadError) {
                     const { data: urlData } = supabaseClient.storage.from('product_photos').getPublicUrl(safeName);
                     photoUrl = urlData.publicUrl;
-                } else { console.error("Error Storage:", uploadError); }
+                } else { alert("Error subiendo imagen: " + uploadError.message); }
             }
 
             const { error } = await supabaseClient.from('inventario').insert([{ nombre: name, cantidad_actual: Number(qty), stock_minimo: Number(min), fecha_vencimiento: expiry, url_foto: photoUrl, notas: note }]);
             if (error) alert("Error: " + error.message);
             else { alert("Material Registrado"); toggleModal('modal-product'); initInventory(); }
-        };
+        });
 
         window.updateQty = async (id, newQty) => {
             if (newQty < 0) return;
@@ -440,7 +434,11 @@
             }
         };
 
-        window.addPatient = async (type) => {
+        // --- PACIENTES ---
+        document.getElementById('btn-add-consulta').addEventListener('click', () => addPatient('Consulta'));
+        document.getElementById('btn-add-radiografia').addEventListener('click', () => addPatient('Radiografía'));
+
+        async function addPatient(type) {
             const gender = document.querySelector(`input[name="gender"]:checked`)?.value;
             const age = document.querySelector(`input[name="age"]:checked`)?.value;
             const xray = document.getElementById('xray-check').checked;
@@ -448,11 +446,14 @@
 
             const { error } = await supabaseClient.from('pacientes').insert([{ tipo_servicio: type, genero: gender, rango_edad: age, realizo_radiografia: xray }]);
             if (error) alert("Error: " + error.message);
-            else { alert("Paciente registrado"); document.getElementById('xray-check').checked = false; }
-        };
+            else { alert("Paciente registrado exitosamente"); document.getElementById('xray-check').checked = false; }
+        }
 
+        // --- ANALÍTICA ---
         let chartGender, chartAge;
-        window.loadStats = async () => {
+        document.getElementById('btn-sync-stats').addEventListener('click', loadStats);
+
+        async function loadStats() {
             const range = document.getElementById('stats-range').value;
             let query = supabaseClient.from('pacientes').select('*');
             if (range === 'day') {
@@ -484,17 +485,17 @@
                 data: { labels: ['Niños', 'Jóvenes', 'Adultos'], datasets: [{ label: 'Pacientes', data: [kids, youth, adults], backgroundColor: '#8A2BE2', borderRadius: 10 }] },
                 options: { responsive: true, maintainAspectRatio: false }
             });
-        };
+        }
 
-        window.exportPDF = () => {
+        // --- PDF ---
+        document.getElementById('btn-export-pdf').addEventListener('click', () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            doc.setFontSize(18);
-            doc.text("Inventario Clínica Dental Imagina", 14, 20);
+            doc.setFontSize(20);
+            doc.text("Reporte de Inventario - Clínica Dental Imagina", 14, 20);
             doc.setFontSize(10);
-            doc.text(`Fecha de reporte: ${new Date().toLocaleDateString()}`, 14, 28);
-            
-            const tableData = allProducts.map(p => [p.nombre, p.cantidad_actual, p.stock_minimo, p.fecha_vencimiento || 'S/V']);
+            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 28);
+            const tableData = allProducts.map(p => [p.nombre, p.cantidad_actual, p.stock_minimo, p.fecha_vencimiento || 'No aplica']);
             doc.autoTable({
                 startY: 35,
                 head: [['Producto', 'Cantidad', 'Stock Mínimo', 'Vencimiento']],
@@ -502,7 +503,7 @@
                 headStyles: { fillColor: [138, 43, 226] }
             });
             doc.save('Inventario_Dental_Imagina.pdf');
-        };
+        });
     </script>
 </body>
 </html>
