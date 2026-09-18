@@ -3,32 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dental Imagina | Corporate Management System</title>
+    <title>Dental Imagina | Corporate ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         :root {
-            --primary-purple: #6D28D9;
-            --dark-purple: #4C1D95;
-            --light-purple: #DDD6FE;
-            --accent-cyan: #06B6D4;
+            --brand-purple: #8A2BE2;
+            --brand-dark: #4B0082;
+            --brand-light: #F3E8FF;
+            --brand-accent: #06B6D4;
         }
         body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .bg-corporate-gradient { background: linear-gradient(135deg, #2E1065 0%, #4C1D95 100%); }
-        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .bg-corporate-gradient { background: linear-gradient(135deg, #4B0082 0%, #8A2BE2 100%); }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
         .sidebar-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar-item.active { background: var(--primary-purple); color: white; box-shadow: 0 4px 15px rgba(109, 40, 217, 0.4); }
-        .btn-primary { background: var(--primary-purple); transition: all 0.3s ease; }
-        .btn-primary:hover { background: var(--dark-purple); transform: translateY(-2px); }
-        .input-field { border: 1px solid #E2E8F0; transition: all 0.2s ease; }
-        .input-field:focus { border-color: var(--primary-purple); ring: 2px var(--light-purple); outline: none; }
+        .sidebar-item.active { background: var(--brand-purple); color: white !important; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); }
+        .btn-corporate { background: var(--brand-purple); transition: all 0.3s ease; }
+        .btn-corporate:hover { background: var(--brand-dark); transform: translateY(-2px); }
+        .input-corporate { border: 1px solid #E2E8F0; transition: all 0.2s ease; }
+        .input-corporate:focus { border-color: var(--brand-purple); ring: 2px var(--brand-light); outline: none; }
         .status-critical { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
         .status-stable { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .sidebar-collapsed { transform: translateX(-100%); }
+            .main-content-mobile { padding: 1rem; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-900">
@@ -36,21 +44,19 @@
     <!-- LOGIN SCREEN -->
     <div id="login-screen" class="hidden flex items-center justify-center min-h-screen p-6 bg-corporate-gradient">
         <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center fade-in">
-            <div class="inline-flex items-center justify-center w-24 h-24 bg-purple-100 rounded-full mb-8">
-                <i class="fas fa-tooth text-5xl text-purple-700"></i>
-            </div>
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Dental Imagina</h1>
-            <p class="text-slate-500 mb-10 font-medium">Acceso al Sistema Corporativo</p>
+            <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-24 mx-auto mb-8" alt="Dental Imagina Logo">
+            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Panel Administrativo</h1>
+            <p class="text-slate-500 mb-10 font-medium">Acceso restringido a personal autorizado</p>
             <div class="space-y-6">
                 <div class="text-left">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Usuario Administrador</label>
-                    <input type="text" id="login-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-field">
+                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Usuario</label>
+                    <input type="text" id="login-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-corporate">
                 </div>
                 <div class="text-left">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Clave de Seguridad</label>
-                    <input type="password" id="login-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-field">
+                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Contraseña</label>
+                    <input type="password" id="login-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl input-corporate">
                 </div>
-                <button onclick="handleLogin()" class="w-full btn-primary text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Iniciar Sesión</button>
+                <button onclick="handleLogin()" class="w-full btn-corporate text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Ingresar</button>
             </div>
         </div>
     </div>
@@ -58,72 +64,110 @@
     <!-- MAIN APP LAYOUT -->
     <div id="app-screen" class="hidden flex flex-col md:flex-row min-h-screen">
         <!-- Sidebar -->
-        <aside class="w-full md:w-80 bg-slate-900 text-white flex flex-col shadow-2xl">
+        <aside id="sidebar" class="fixed md:relative z-50 w-full md:w-80 bg-slate-900 text-white flex flex-col shadow-2xl transition-transform duration-300 sidebar-collapsed md:transform-none">
             <div class="p-10 text-center border-b border-slate-800">
-                <div class="flex flex-col items-center gap-3">
-                    <div class="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center shadow-lg mb-2">
-                        <i class="fas fa-tooth text-3xl text-white"></i>
-                    </div>
-                    <h2 class="text-2xl font-bold tracking-tight">Dental Imagina</h2>
-                    <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Corporate Edition</span>
-                </div>
+                <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-16 mx-auto mb-4 brightness-110" alt="Logo">
+                <h2 class="text-xl font-bold tracking-tight text-white">SISTEMA ERP</h2>
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Clínica Dental Imagina</span>
             </div>
             <div class="flex flex-col p-6 space-y-4 flex-grow">
                 <button data-section="sec-inventory" class="sidebar-item active p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-warehouse w-6 text-center"></i> Gestión de Almacén
+                    <i class="fas fa-boxes-stacked w-6 text-center"></i> Gestión de Inventario
                 </button>
                 <button data-section="sec-patients" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
                     <i class="fas fa-user-nurse w-6 text-center"></i> Registro de Pacientes
                 </button>
                 <button data-section="sec-stats" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-chart-line w-6 text-center"></i> Analítica Corporativa
+                    <i class="fas fa-chart-line w-6 text-center"></i> Analítica de Datos
                 </button>
             </div>
             <div class="p-6">
                 <button onclick="handleLogout()" class="w-full p-4 bg-slate-800 hover:bg-red-900 text-red-400 hover:text-white rounded-2xl flex items-center justify-center gap-3 transition-all font-bold border border-slate-700">
-                    <i class="fas fa-power-off"></i> Finalizar Sesión
+                    <i class="fas fa-sign-out-alt"></i> Salir del Sistema
                 </button>
             </div>
         </aside>
 
         <!-- Content -->
-        <main class="flex-grow p-6 md:p-12 overflow-y-auto bg-slate-50">
-            
-            <!-- Inventory -->
+        <main class="flex-grow p-4 md:p-12 overflow-y-auto bg-slate-50 relative">
+            <!-- Mobile Menu Toggle -->
+            <button onclick="toggleSidebar()" class="md:hidden absolute top-4 left-4 z-50 p-3 bg-slate-900 text-white rounded-xl shadow-lg">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <!-- Inventory Section -->
             <section id="sec-inventory" class="section space-y-10 fade-in">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                     <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Gestión de Inventario</h2>
-                        <p class="text-slate-500 font-medium">Control profesional de suministros y lotes</p>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Almacén Corporativo</h2>
+                        <p class="text-slate-500 font-medium">Control de existencias, lotes y suministros</p>
                     </div>
-                    <button onclick="toggleModal('modal-product')" class="btn-primary text-white px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center gap-3">
-                        <i class="fas fa-plus-circle"></i> Registrar Material
-                    </button>
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="exportPDF()" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:bg-slate-700 transition flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                        <button onclick="toggleModal('modal-product')" class="btn-corporate text-white px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center gap-2">
+                            <i class="fas fa-plus-circle"></i> Agregar Material
+                        </button>
+                    </div>
                 </div>
 
+                <!-- Professional Search and Filter -->
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border flex flex-col md:flex-row gap-4 items-center">
+                    <div class="relative flex-grow w-full">
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="search-inv" oninput="filterInventory()" placeholder="Buscar producto, SKU o categoría..." class="w-full pl-12 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition">
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <button onclick="filterStock('all')" class="px-4 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Todos</button>
+                        <button onclick="filterStock('low')" class="px-4 py-3 rounded-xl bg-red-100 text-red-600 font-bold text-sm hover:bg-red-200 transition">Stock Bajo</button>
+                        <button onclick="filterStock('high')" class="px-4 py-3 rounded-xl bg-green-100 text-green-600 font-bold text-sm hover:bg-green-200 transition">Stock Alto</button>
+                    </div>
+                </div>
+
+                <!-- Summary Stats -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-14 h-14 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-box"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Productos</p><p id="inv-total" class="text-3xl font-black">0</p></div>
+                        <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-box-open"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Productos</p><p id="inv-total" class="text-3xl font-black">0</p></div>
                     </div>
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-14 h-14 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-triangle-exclamation"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Stock Crítico</p><p id="inv-critical" class="text-3xl font-black">0</p></div>
+                        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-triangle-exclamation"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alertas Stock</p><p id="inv-critical" class="text-3xl font-black">0</p></div>
                     </div>
                     <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-14 h-14 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-check-double"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Suministros Óptimos</p><p id="inv-ok" class="text-3xl font-black">0</p></div>
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-check-circle"></i></div>
+                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Suministros OK</p><p id="inv-ok" class="text-3xl font-black">0</p></div>
                     </div>
                 </div>
 
-                <div id="inventory-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+                <!-- Professional Inventory Table -->
+                <div class="bg-white rounded-[2rem] shadow-sm border overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-50 border-b border-slate-100">
+                                <tr>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Producto</th>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Categoría</th>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Stock</th>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento</th>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado</th>
+                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventory-table-body" class="divide-y divide-slate-100">
+                                <!-- Rows load here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
-            <!-- Patients -->
+            <!-- Patients Section -->
             <section id="sec-patients" class="section hidden space-y-10 fade-in">
                 <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-4">Registro Clínico</h2>
-                    <p class="text-slate-500 font-medium">Toma de datos demográficos y servicios realizados</p>
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-4">Registro Clínico Profesional</h2>
+                    <p class="text-slate-500 font-medium">Sincronización de atenciones y diagnósticos preliminares</p>
                 </div>
                 <div class="bg-white p-12 rounded-[3rem] shadow-xl border border-slate-100 max-w-4xl mx-auto">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
@@ -139,7 +183,7 @@
                             </div>
                         </div>
                         <div class="space-y-6">
-                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-user-graduate text-purple-600"></i> Etapa de Vida</p>
+                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-user-graduate text-purple-600"></i> Rango Etario</p>
                             <div class="grid grid-cols-3 gap-3">
                                 <label class="flex items-center justify-center gap-2 p-4 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
                                     <input type="radio" name="age" value="niño" class="w-4 h-4"> <span class="text-sm font-bold">Niño</span>
@@ -168,19 +212,19 @@
                 </div>
             </section>
 
-            <!-- Stats -->
+            <!-- Stats Section -->
             <section id="sec-stats" class="section hidden space-y-12 fade-in">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
                     <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Analítica Corporativa</h2>
-                        <p class="text-slate-500 font-medium">Métricas de desempeño y flujo de pacientes</p>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Analítica de Datos</h2>
+                        <p class="text-slate-500 font-medium">Métricas de flujo y demografía de pacientes</p>
                     </div>
                     <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border">
                         <select id="stats-range" class="p-3 rounded-xl bg-slate-50 outline-none font-bold text-slate-600">
                             <option value="day">📅 Hoy</option>
                             <option value="week">🗓️ Esta Semana</option>
                             <option value="month">📅 Este Mes</option>
-                            <option value="all">♾️ Histórico Total</option>
+                            <option value="all">♾️ Histórico</option>
                         </select>
                         <button onclick="loadStats()" class="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-purple-700 transition">Sincronizar</button>
                     </div>
@@ -188,30 +232,30 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-purple-600 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Pacientes Totales</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Atenciones</p>
                         <p id="stat-total" class="text-6xl font-black text-slate-900">0</p>
                     </div>
                     <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-pink-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Distribución Género</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Distribución</p>
                         <p id="stat-gender" class="text-lg font-bold text-slate-800">-</p>
                     </div>
                     <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-yellow-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Segmento Edad</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Segmentos</p>
                         <p id="stat-age" class="text-sm font-bold text-slate-800">-</p>
                     </div>
                     <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-cyan-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Total Rayos X</p>
+                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Rayos X</p>
                         <p id="stat-xrays" class="text-6xl font-black text-cyan-600">0</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
-                        <h3 class="text-2xl font-black mb-8 text-slate-800">Análisis de Género</h3>
+                        <h3 class="text-2xl font-black mb-8 text-slate-800">Distribución de Género</h3>
                         <div class="h-[300px]"><canvas id="chartGender"></canvas></div>
                     </div>
                     <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
-                        <h3 class="text-2xl font-black mb-8 text-slate-800">Volumen por Segmento</h3>
+                        <h3 class="text-2xl font-black mb-8 text-slate-800">Volumen por Edad</h3>
                         <div class="h-[300px]"><canvas id="chartAge"></canvas></div>
                     </div>
                 </div>
@@ -219,25 +263,26 @@
         </main>
     </div>
 
-    <!-- MODAL PRODUCT -->
+    <!-- PRODUCT MODAL -->
     <div id="modal-product" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
         <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl p-12 fade-in">
             <div class="flex justify-between items-center mb-10">
-                <h3 class="text-3xl font-black text-slate-900">Registrar Nuevo Material</h3>
+                <h3 class="text-3xl font-black text-slate-900">Registrar Material</h3>
                 <button onclick="toggleModal('modal-product')" class="text-slate-400 hover:text-slate-600 text-4xl">&times;</button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
                 <div class="space-y-6">
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Nombre del Material</label><input type="text" id="prod-name" class="w-full p-4 border rounded-2xl input-field"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Cantidad Inicial</label><input type="number" id="prod-qty" class="w-full p-4 border rounded-2xl input-field"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Stock Mínimo (Alerta)</label><input type="number" id="prod-min" value="5" class="w-full p-4 border rounded-2xl input-field"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Nombre del Producto</label><input type="text" id="prod-name" class="w-full p-4 border rounded-2xl input-corporate"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Cantidad Inicial</label><input type="number" id="prod-qty" class="w-full p-4 border rounded-2xl input-corporate"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Stock Mínimo (Alerta)</label><input type="number" id="prod-min" value="5" class="w-full p-4 border rounded-2xl input-corporate"></div>
                 </div>
                 <div class="space-y-6">
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fecha de Vencimiento</label><input type="date" id="prod-expiry" class="w-full p-4 border rounded-2xl input-field"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fotografía Corporativa</label><input type="file" id="prod-photo" class="w-full text-xs p-3 border rounded-2xl bg-slate-50"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fecha Vencimiento (Opcional)</label><input type="date" id="prod-expiry" class="w-full p-4 border rounded-2xl input-corporate"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fotografía del Producto</label><input type="file" id="prod-photo" class="w-full text-xs p-3 border rounded-2xl bg-slate-50"></div>
+                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Comentario / Nota</label><textarea id="prod-note" class="w-full p-4 border rounded-2xl input-corporate h-20"></textarea></div>
                 </div>
             </div>
-            <button onclick="saveProduct()" class="w-full mt-12 btn-primary text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all">Guardar en Inventario</button>
+            <button onclick="saveProduct()" class="w-full mt-12 btn-corporate text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all">Guardar en Almacén</button>
         </div>
     </div>
 
@@ -249,7 +294,8 @@
         const VALID_USER = "AdminImagina";
         const VALID_PASS = "ImaginaRoot333";
 
-        // PERSISTENCIA DE SESIÓN
+        let allProducts = [];
+
         window.onload = () => {
             if (localStorage.getItem('dental_auth') === 'true') {
                 document.getElementById('login-screen').classList.add('hidden');
@@ -261,9 +307,7 @@
         };
 
         window.handleLogin = () => {
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
-            if (user === VALID_USER && pass === VALID_PASS) {
+            if (document.getElementById('login-user').value === VALID_USER && document.getElementById('login-pass').value === VALID_PASS) {
                 localStorage.setItem('dental_auth', 'true');
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app-screen').classList.remove('hidden');
@@ -275,6 +319,10 @@
             localStorage.removeItem('dental_auth');
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('app-screen').classList.add('hidden');
+        };
+
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
         };
 
         window.toggleModal = (id) => {
@@ -289,35 +337,52 @@
                 document.querySelectorAll('.nav-link').forEach(l => { l.classList.remove('active'); l.classList.add('text-slate-400'); });
                 link.classList.add('active');
                 link.classList.remove('text-slate-400');
+                if(window.innerWidth < 768) toggleSidebar();
             });
         });
 
         async function initInventory() {
             const { data } = await supabaseClient.from('inventario').select('*').order('nombre');
-            const list = document.getElementById('inventory-list');
+            allProducts = data || [];
+            renderInventory(allProducts);
+        }
+
+        function renderInventory(products) {
+            const tbody = document.getElementById('inventory-table-body');
             let total = 0, critical = 0, ok = 0;
-            list.innerHTML = "";
-            data?.forEach(item => {
+            tbody.innerHTML = "";
+            
+            products.forEach(item => {
                 total++;
                 const isLow = item.cantidad_actual <= (item.stock_minimo || 5);
                 if (isLow) critical++; else ok++;
-                list.innerHTML += `
-                    <div class="bg-white p-8 rounded-[2.5rem] shadow-sm border card-hover flex flex-col gap-6">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-5">
-                                <img src="${item.url_foto || 'https://via.placeholder.com/80'}" class="w-20 h-20 rounded-3xl object-cover shadow-sm">
-                                <div><p class="font-black text-slate-800 text-xl leading-tight">${item.nombre}</p><p class="text-xs text-slate-400 font-medium mt-1">Venc: ${item.fecha_vencimiento || 'N/A'}</p></div>
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-all group">
+                        <td class="p-6">
+                            <div class="flex items-center gap-4">
+                                <img src="${item.url_foto || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-xl object-cover shadow-sm">
+                                <div class="font-bold text-slate-800">${item.nombre}</div>
                             </div>
-                            <span class="px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${isLow ? 'status-critical' : 'status-stable'}">
-                                ${isLow ? 'Stock Crítico' : 'Suministro OK'}
+                        </td>
+                        <td class="p-6 text-sm text-slate-500">${item.categoria || 'General'}</td>
+                        <td class="p-6">
+                            <div class="flex items-center gap-3">
+                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual - 1})" class="w-8 h-8 bg-white border rounded-lg text-red-500 hover:bg-red-50">-</button>
+                                <span class="font-black w-8 text-center">${item.cantidad_actual}</span>
+                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual + 1})" class="w-8 h-8 bg-white border rounded-lg text-green-500 hover:bg-green-50">+</button>
+                            </div>
+                        </td>
+                        <td class="p-6 text-sm text-slate-500">${item.fecha_vencimiento || 'S/V'}</td>
+                        <td class="p-6">
+                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${isLow ? 'status-critical' : 'status-stable'}">
+                                ${isLow ? 'Crítico' : 'Estable'}
                             </span>
-                        </div>
-                        <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <button onclick="updateQty('${item.id}', ${item.cantidad_actual - 1})" class="w-12 h-12 bg-white text-red-500 rounded-xl shadow-sm hover:bg-red-50 transition-all">-</button>
-                            <span class="font-black text-slate-800 text-2xl">${item.cantidad_actual}</span>
-                            <button onclick="updateQty('${item.id}', ${item.cantidad_actual + 1})" class="w-12 h-12 bg-white text-green-500 rounded-xl shadow-sm hover:bg-green-50 transition-all">+</button>
-                        </div>
-                    </div>
+                        </td>
+                        <td class="p-6 text-center">
+                            <button onclick="deleteProduct('${item.id}')" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
                 `;
             });
             document.getElementById('inv-total').innerText = total;
@@ -325,13 +390,26 @@
             document.getElementById('inv-ok').innerText = ok;
         }
 
+        window.filterInventory = () => {
+            const term = document.getElementById('search-inv').value.toLowerCase();
+            const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(term) || (p.categoria && p.categoria.toLowerCase().includes(term)));
+            renderInventory(filtered);
+        };
+
+        window.filterStock = (type) => {
+            if(type === 'all') renderInventory(allProducts);
+            else if(type === 'low') renderInventory(allProducts.filter(p => p.cantidad_actual <= (p.stock_minimo || 5)));
+            else if(type === 'high') renderInventory(allProducts.filter(p => p.cantidad_actual > (p.stock_minimo || 5)));
+        };
+
         window.saveProduct = async () => {
             const name = document.getElementById('prod-name').value;
             const qty = document.getElementById('prod-qty').value;
             const min = document.getElementById('prod-min').value;
             const expiry = document.getElementById('prod-expiry').value;
+            const note = document.getElementById('prod-note').value;
             const fileInput = document.getElementById('prod-photo');
-            if (!name || !qty) return alert("Complete los campos obligatorios");
+            if (!name || !qty) return alert("Nombre y cantidad son obligatorios");
 
             let photoUrl = "";
             if (fileInput.files[0]) {
@@ -341,18 +419,25 @@
                 if (!uploadError) {
                     const { data: urlData } = supabaseClient.storage.from('product_photos').getPublicUrl(safeName);
                     photoUrl = urlData.publicUrl;
-                }
+                } else { console.error("Error Storage:", uploadError); }
             }
 
-            const { error } = await supabaseClient.from('inventario').insert([{ nombre: name, cantidad_actual: Number(qty), stock_minimo: Number(min), fecha_vencimiento: expiry, url_foto: photoUrl }]);
+            const { error } = await supabaseClient.from('inventario').insert([{ nombre: name, cantidad_actual: Number(qty), stock_minimo: Number(min), fecha_vencimiento: expiry, url_foto: photoUrl, notas: note }]);
             if (error) alert("Error: " + error.message);
-            else { alert("Suministro registrado"); toggleModal('modal-product'); initInventory(); }
+            else { alert("Material Registrado"); toggleModal('modal-product'); initInventory(); }
         };
 
         window.updateQty = async (id, newQty) => {
             if (newQty < 0) return;
             await supabaseClient.from('inventario').update({ cantidad_actual: newQty }).eq('id', id);
             initInventory();
+        };
+
+        window.deleteProduct = async (id) => {
+            if(confirm("¿Eliminar este producto?")) {
+                await supabaseClient.from('inventario').delete().eq('id', id);
+                initInventory();
+            }
         };
 
         window.addPatient = async (type) => {
@@ -363,7 +448,7 @@
 
             const { error } = await supabaseClient.from('pacientes').insert([{ tipo_servicio: type, genero: gender, rango_edad: age, realizo_radiografia: xray }]);
             if (error) alert("Error: " + error.message);
-            else { alert("Paciente registrado en el sistema"); document.getElementById('xray-check').checked = false; }
+            else { alert("Paciente registrado"); document.getElementById('xray-check').checked = false; }
         };
 
         let chartGender, chartAge;
@@ -379,7 +464,7 @@
             data?.forEach(p => {
                 total++;
                 if (p.genero === 'F') women++; else men++;
-                if (p.rango_edad === 'niño') kids++; else if (p.rango_edad === 'juvenil') youth++; else adults++;
+                if (p.rango_edad === 'niño') kids++; else if (p.rango_edad === 'joven') youth++; else adults++;
                 if (p.realizo_radiografia) xrays++;
             });
             document.getElementById('stat-total').innerText = total;
@@ -391,15 +476,32 @@
             chartGender = new Chart(document.getElementById('chartGender'), {
                 type: 'doughnut',
                 data: { labels: ['Mujeres', 'Hombres'], datasets: [{ data: [women, men], backgroundColor: ['#D946EF', '#3B82F6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                options: { responsive: true, maintainAspectRatio: false }
             });
-
             if (chartAge) chartAge.destroy();
             chartAge = new Chart(document.getElementById('chartAge'), {
                 type: 'bar',
-                data: { labels: ['Niños', 'Jóvenes', 'Adultos'], datasets: [{ label: 'Pacientes', data: [kids, youth, adults], backgroundColor: '#6D28D9', borderRadius: 10 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } } }
+                data: { labels: ['Niños', 'Jóvenes', 'Adultos'], datasets: [{ label: 'Pacientes', data: [kids, youth, adults], backgroundColor: '#8A2BE2', borderRadius: 10 }] },
+                options: { responsive: true, maintainAspectRatio: false }
             });
+        };
+
+        window.exportPDF = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text("Inventario Clínica Dental Imagina", 14, 20);
+            doc.setFontSize(10);
+            doc.text(`Fecha de reporte: ${new Date().toLocaleDateString()}`, 14, 28);
+            
+            const tableData = allProducts.map(p => [p.nombre, p.cantidad_actual, p.stock_minimo, p.fecha_vencimiento || 'S/V']);
+            doc.autoTable({
+                startY: 35,
+                head: [['Producto', 'Cantidad', 'Stock Mínimo', 'Vencimiento']],
+                body: tableData,
+                headStyles: { fillColor: [138, 43, 226] }
+            });
+            doc.save('Inventario_Dental_Imagina.pdf');
         };
     </script>
 </body>
