@@ -1,509 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clínica Dental Imagina | ERP Corporativo</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-        :root {
-            --brand-purple: #8A2BE2;
-            --brand-dark: #4B0082;
-            --brand-light: #F3E8FF;
-        }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .bg-corporate-gradient { background: linear-gradient(135deg, #4B0082 0%, #8A2BE2 100%); }
-        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); }
-        .sidebar-item { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
-        .sidebar-item.active { background: var(--brand-purple); color: white !important; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4); }
-        .btn-corporate { background: var(--brand-purple); transition: all 0.3s ease; }
-        .btn-corporate:hover { background: var(--brand-dark); transform: translateY(-2px); }
-        .status-critical { background: #FEE2E2; color: #B91C1C; border: 1px solid #FCA5A5; }
-        .status-stable { background: #DCFCE7; color: #15803D; border: 1px solid #86EFAC; }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .sidebar-collapsed { transform: translateX(-100%); }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IMAGINA · Control de Inventario</title>
+<meta name="description" content="Sistema profesional de inventario para Clínica Dental Imagina">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{--p:#6C3B8C;--p2:#9B6FBF;--soft:#F3ECF7;--ink:#25222A;--muted:#746E7D;--line:#E9E4ED;--bg:#F7F6F9;--white:#fff;--ok:#18865B;--warn:#B56B00;--danger:#C53B4D;--shadow:0 12px 35px rgba(52,32,66,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px Inter,system-ui,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.app{min-height:100vh}.sidebar{position:fixed;z-index:20;left:0;top:0;bottom:0;width:250px;background:#fff;border-right:1px solid var(--line);padding:24px 16px;display:flex;flex-direction:column}
+.brand{display:flex;align-items:center;gap:11px;padding:2px 10px 28px}.brandmark{width:42px;height:42px;border-radius:13px;background:linear-gradient(135deg,var(--p),var(--p2));display:grid;place-items:center;color:#fff;box-shadow:0 8px 18px rgba(108,59,140,.24)}.brandmark i{font-size:19px}.brand strong{font:800 20px Manrope}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:.09em;text-transform:uppercase;margin-top:2px}
+.nav-title{padding:10px 12px 8px;color:#aaa1b0;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.nav button{width:100%;border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:11px;color:#625B69;display:flex;align-items:center;gap:12px;margin:2px 0}.nav button i{width:18px;text-align:center}.nav button:hover{background:#f7f3f9;color:var(--p)}.nav button.active{background:var(--soft);color:var(--p);font-weight:700}
+.userbox{margin-top:auto;border-top:1px solid var(--line);padding:15px 8px 0;display:flex;align-items:center;gap:10px}.avatar{width:34px;height:34px;border-radius:50%;background:#e9def0;color:var(--p);display:grid;place-items:center;font-weight:800}.userbox div:nth-child(2){min-width:0;flex:1}.userbox b{display:block;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.userbox span{color:var(--muted);font-size:11px}
+.main{margin-left:250px;min-height:100vh}.topbar{height:72px;background:rgba(255,255,255,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px;position:sticky;top:0;z-index:10}.search{display:flex;align-items:center;gap:9px;color:#aaa;background:#f8f7fa;border:1px solid #eeeaf1;border-radius:10px;padding:9px 12px;width:320px}.search input{border:0;outline:0;background:transparent;width:100%}.top-actions{display:flex;gap:9px;align-items:center}.iconbtn{border:1px solid var(--line);background:#fff;width:38px;height:38px;border-radius:10px;color:#625B69}.content{padding:28px 30px 40px;max-width:1600px;margin:auto}.pagehead{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:22px}.pagehead h1{font:800 27px Manrope;margin:0 0 6px}.pagehead p{margin:0;color:var(--muted)}.actions{display:flex;gap:9px}.btn{border:1px solid var(--line);background:#fff;color:#4e4756;padding:10px 14px;border-radius:10px;font-weight:700}.btn.primary{background:var(--p);border-color:var(--p);color:#fff;box-shadow:0 8px 18px rgba(108,59,140,.2)}.btn.primary:hover{background:#5d3279}.btn i{margin-right:7px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:18px}.card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)}.stat{padding:18px}.stat-top{display:flex;justify-content:space-between;align-items:center}.stat-icon{width:40px;height:40px;border-radius:11px;background:var(--soft);color:var(--p);display:grid;place-items:center}.stat .label{font-size:12px;color:var(--muted);font-weight:600}.stat .value{font:800 25px Manrope;margin-top:12px}.stat .sub{font-size:11px;color:var(--muted);margin-top:5px}.positive{color:var(--ok)!important}.warning{color:var(--warn)!important}.danger{color:var(--danger)!important}
+.grid2{display:grid;grid-template-columns:1.55fr 1fr;gap:18px}.panel{padding:19px}.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px}.panel-head h3{margin:0;font:800 15px Manrope}.panel-head span{font-size:12px;color:var(--muted)}.chart{height:240px;display:flex;align-items:end;gap:10px;padding:15px 8px 0;border-top:1px solid #f2eef4}.barwrap{flex:1;height:100%;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px}.bar{width:100%;max-width:42px;background:linear-gradient(180deg,var(--p2),var(--p));border-radius:8px 8px 3px 3px;min-height:5px}.barwrap small{font-size:10px;color:#928b99}.list{display:flex;flex-direction:column;gap:9px}.rowitem{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid #f0edf2}.rowitem:last-child{border-bottom:0}.thumb{width:42px;height:42px;border-radius:9px;object-fit:cover;background:#f0edf3;display:grid;place-items:center;color:#a39ba9}.rowitem .meta{min-width:0;flex:1}.rowitem b{font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rowitem span{font-size:11px;color:var(--muted)}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800}.badge.ok{background:#e7f6ef;color:var(--ok)}.badge.low{background:#fff3df;color:var(--warn)}.badge.out{background:#fde9ed;color:var(--danger)}
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.filter{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 11px;color:#554e5c;outline:0}.grow{flex:1;min-width:180px}.tablewrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:900px}.table th{text-align:left;color:#8b8390;font-size:10px;text-transform:uppercase;letter-spacing:.07em;padding:11px 12px;border-bottom:1px solid var(--line)}.table td{padding:13px 12px;border-bottom:1px solid #f0edf2;font-size:12px;vertical-align:middle}.itemcell{display:flex;align-items:center;gap:10px}.itemphoto{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#f2eff4;display:grid;place-items:center;color:#a39ba9}.actions-cell{white-space:nowrap}.mini{border:0;background:#f5f2f7;color:#625a69;width:31px;height:31px;border-radius:8px;margin-right:3px}.mini:hover{background:var(--soft);color:var(--p)}
+.modal{position:fixed;inset:0;background:rgba(31,24,35,.45);backdrop-filter:blur(4px);z-index:50;display:grid;place-items:center;padding:20px}.modalbox{background:#fff;width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:18px;box-shadow:0 25px 70px rgba(25,17,31,.25)}.modalhead{padding:19px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modalhead h2{margin:0;font:800 17px Manrope}.modalbody{padding:22px}.formgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}.field label{display:block;font-size:11px;font-weight:800;color:#625b69;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid #ddd7e2;border-radius:9px;padding:10px 11px;outline:0;background:#fff}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--p);box-shadow:0 0 0 3px rgba(108,59,140,.09)}.field.full{grid-column:1/-1}.upload{border:1px dashed #cfc5d6;border-radius:12px;padding:16px;text-align:center;color:var(--muted)}.upload img{max-width:120px;max-height:120px;border-radius:10px;display:block;margin:8px auto}.modalfoot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+.login{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 15% 15%,#eadff0,transparent 30%),linear-gradient(135deg,#f9f8fa,#f0ebf4)}.loginbox{width:min(420px,92%);background:#fff;border:1px solid var(--line);border-radius:22px;padding:32px;box-shadow:0 25px 70px rgba(50,31,61,.13)}.loginbrand{text-align:center;margin-bottom:26px}.loginbrand .brandmark{margin:auto;width:54px;height:54px}.loginbrand h1{font:800 25px Manrope;margin:13px 0 3px}.loginbrand p{margin:0;color:var(--muted)}.login .field{margin-bottom:13px}.loginmsg{font-size:12px;margin-top:10px;color:var(--danger);min-height:17px}.login-note{margin-top:16px;color:#918996;font-size:11px;line-height:1.5;text-align:center}
+.empty{padding:50px;text-align:center;color:var(--muted)}.empty i{font-size:30px;color:#c9bdcf;margin-bottom:10px}.toast{position:fixed;right:20px;bottom:20px;background:#29232e;color:#fff;padding:12px 15px;border-radius:10px;box-shadow:var(--shadow);z-index:100;font-size:12px}
+@media(max-width:1000px){.sidebar{width:72px;padding:18px 10px}.brand{justify-content:center;padding:0 0 25px}.brand>div:last-child,.nav-title,.nav button span,.userbox div:nth-child(2){display:none}.nav button{justify-content:center}.userbox{justify-content:center}.main{margin-left:72px}.stats{grid-template-columns:repeat(2,1fr)}.grid2{grid-template-columns:1fr}}
+@media(max-width:650px){.topbar{padding:0 15px}.search{width:190px}.content{padding:20px 15px}.pagehead{display:block}.actions{margin-top:14px}.stats{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}}
+</style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-900">
-
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="hidden flex items-center justify-center min-h-screen p-6 bg-corporate-gradient">
-        <div class="bg-white p-12 rounded-[2.5rem] shadow-2xl w-full max-w-md text-center fade-in">
-            <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-24 mx-auto mb-8" alt="Clínica Dental Imagina">
-            <h1 class="text-3xl font-extrabold text-slate-900 mb-2 tracking-tight">Acceso Corporativo</h1>
-            <p class="text-slate-500 mb-10 font-medium">Clínica Dental Imagina</p>
-            <div class="space-y-6">
-                <div class="text-left">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Usuario</label>
-                    <input type="text" id="login-user" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500">
-                </div>
-                <div class="text-left">
-                    <label class="text-xs font-bold text-slate-400 ml-1 uppercase tracking-wider">Contraseña</label>
-                    <input type="password" id="login-pass" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500">
-                </div>
-                <button id="btn-login" class="w-full btn-corporate text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Ingresar al Sistema</button>
-            </div>
-        </div>
+<body>
+<div id="loginView" class="login">
+  <form class="loginbox" id="loginForm">
+    <div class="loginbrand">
+      <div class="brandmark"><i class="fa-solid fa-tooth"></i></div>
+      <h1>IMAGINA</h1><p>Control de Inventario</p>
     </div>
+    <div class="field"><label>Correo electrónico</label><input id="email" type="email" placeholder="admin@clinicaimagina.com.bo" required></div>
+    <div class="field"><label>Contraseña</label><input id="password" type="password" placeholder="••••••••" required></div>
+    <button class="btn primary" style="width:100%;padding:12px" type="submit"><i class="fa-solid fa-right-to-bracket"></i> Ingresar</button>
+    <div id="loginMsg" class="loginmsg"></div>
+    <div class="login-note">Conecta este frontend con Supabase Auth para habilitar usuarios reales. No guardes contraseñas en el HTML.</div>
+  </form>
+</div>
 
-    <!-- MAIN APP LAYOUT -->
-    <div id="app-screen" class="hidden flex flex-col md:flex-row min-h-screen">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="fixed md:relative z-50 w-full md:w-80 bg-slate-900 text-white flex flex-col shadow-2xl transition-transform duration-300 sidebar-collapsed md:transform-none">
-            <div class="p-10 text-center border-b border-slate-800">
-                <img src="https://www.clinicaimagina.com.bo/wp-content/uploads/2024/10/LOGO_FONDO_LILA_paint-removebg-preview.png" class="h-16 mx-auto mb-4 brightness-110" alt="Logo">
-                <h2 class="text-xl font-bold tracking-tight text-white">SISTEMA ERP</h2>
-                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Clínica Dental Imagina</span>
-            </div>
-            <div class="flex flex-col p-6 space-y-4 flex-grow">
-                <div data-section="sec-inventory" class="sidebar-item active p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-warehouse w-6 text-center"></i> Gestión de Inventario
-                </div>
-                <div data-section="sec-patients" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-user-nurse w-6 text-center"></i> Registro de Pacientes
-                </div>
-                <div data-section="sec-stats" class="sidebar-item p-4 rounded-2xl flex items-center gap-4 text-slate-400 hover:text-white transition-all font-semibold">
-                    <i class="fas fa-chart-line w-6 text-center"></i> Analítica Corporativa
-                </div>
-            </div>
-            <div class="p-6">
-                <button id="btn-logout" class="w-full p-4 bg-slate-800 hover:bg-red-900 text-red-400 hover:text-white rounded-2xl flex items-center justify-center gap-3 transition-all font-bold border border-slate-700">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </button>
-            </div>
-        </aside>
+<div id="app" class="app hidden">
+<aside class="sidebar">
+  <div class="brand"><div class="brandmark"><i class="fa-solid fa-tooth"></i></div><div><strong>IMAGINA</strong><small>Inventario clínico</small></div></div>
+  <div class="nav-title">Gestión</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i><span>Resumen</span></button>
+    <button data-page="inventory"><i class="fa-solid fa-boxes-stacked"></i><span>Inventario</span></button>
+    <button data-page="movements"><i class="fa-solid fa-arrow-right-arrow-left"></i><span>Movimientos</span></button>
+    <button data-page="categories"><i class="fa-solid fa-layer-group"></i><span>Categorías</span></button>
+    <button data-page="locations"><i class="fa-solid fa-location-dot"></i><span>Ubicaciones</span></button>
+    <button data-page="reports"><i class="fa-solid fa-file-pdf"></i><span>Reportes</span></button>
+  </nav>
+  <div class="nav-title">Sistema</div>
+  <nav class="nav"><button id="settingsBtn"><i class="fa-solid fa-sliders"></i><span>Configuración</span></button></nav>
+  <div class="userbox"><div class="avatar" id="avatar">A</div><div><b id="userName">Administrador</b><span id="userEmail">Sesión local</span></div><button class="iconbtn" id="logout" title="Cerrar sesión"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
+</aside>
 
-        <!-- Main Content -->
-        <main class="flex-grow p-4 md:p-12 overflow-y-auto bg-slate-50 relative">
-            <button id="mobile-toggle" class="md:hidden absolute top-4 left-4 z-50 p-3 bg-slate-900 text-white rounded-xl shadow-lg">
-                <i class="fas fa-bars"></i>
-            </button>
+<main class="main">
+<header class="topbar"><div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="globalSearch" placeholder="Buscar material, equipo, medicamento..."></div><div class="top-actions"><button class="iconbtn" id="refresh" title="Actualizar"><i class="fa-solid fa-rotate"></i></button><button class="btn primary" id="quickAdd"><i class="fa-solid fa-plus"></i> Nuevo activo</button></div></header>
+<section class="content">
+<div id="dashboardPage">
+  <div class="pagehead"><div><h1>Resumen del inventario</h1><p>Control centralizado de materiales, equipos e insumos de Clínica Dental Imagina.</p></div><div class="actions"><button class="btn" id="pdfBtn"><i class="fa-solid fa-file-pdf"></i> Generar PDF</button></div></div>
+  <div class="stats">
+    <div class="card stat"><div class="stat-top"><span class="label">Activos registrados</span><div class="stat-icon"><i class="fa-solid fa-boxes-stacked"></i></div></div><div class="value" id="sTotal">0</div><div class="sub">Materiales, equipos y mobiliario</div></div>
+    <div class="card stat"><div class="stat-top"><span class="label">Stock bajo</span><div class="stat-icon"><i class="fa-solid fa-triangle-exclamation"></i></div></div><div class="value warning" id="sLow">0</div><div class="sub">Requieren revisión o reposición</div></div>
+    <div class="card stat"><div class="stat-top"><span class="label">Agotados</span><div class="stat-icon"><i class="fa-solid fa-circle-xmark"></i></div></div><div class="value danger" id="sOut">0</div><div class="sub">Sin existencias disponibles</div></div>
+    <div class="card stat"><div class="stat-top"><span class="label">Valor estimado</span><div class="stat-icon"><i class="fa-solid fa-coins"></i></div></div><div class="value" id="sValue">Bs 0</div><div class="sub">Costo unitario × cantidad</div></div>
+  </div>
+  <div class="grid2">
+    <div class="card panel"><div class="panel-head"><h3>Inventario por categoría</h3><span id="chartNote">Vista actual</span></div><div id="chart" class="chart"></div></div>
+    <div class="card panel"><div class="panel-head"><h3>Alertas de inventario</h3><span>Prioridad</span></div><div id="alerts" class="list"></div></div>
+  </div>
+  <div class="card panel" style="margin-top:18px"><div class="panel-head"><h3>Últimos movimientos</h3><span>Actividad reciente</span></div><div id="recent" class="list"></div></div>
+</div>
 
-            <!-- Inventory -->
-            <section id="sec-inventory" class="section space-y-10 fade-in">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                    <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Gestión de Inventario</h2>
-                        <p class="text-slate-500 font-medium">Control de suministros y auditoría de almacén</p>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        <button id="btn-export-pdf" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:bg-slate-700 transition flex items-center gap-2">
-                            <i class="fas fa-file-pdf"></i> Reporte PDF
-                        </button>
-                        <button id="btn-open-modal" class="btn-corporate text-white px-8 py-4 rounded-2xl font-bold shadow-lg flex items-center gap-2">
-                            <i class="fas fa-plus-circle"></i> Agregar Material
-                        </button>
-                    </div>
-                </div>
+<div id="inventoryPage" class="hidden">
+  <div class="pagehead"><div><h1>Inventario</h1><p>Administra cada artículo con fotografía, ubicación, stock, responsable y trazabilidad.</p></div><div class="actions"><button class="btn" id="exportCsv"><i class="fa-solid fa-file-csv"></i> CSV</button><button class="btn primary" id="addBtn"><i class="fa-solid fa-plus"></i> Nuevo activo</button></div></div>
+  <div class="card panel"><div class="toolbar"><input class="filter grow" id="tableSearch" placeholder="Buscar por nombre, código o marca..."><select class="filter" id="catFilter"><option value="">Todas las categorías</option></select><select class="filter" id="statusFilter"><option value="">Todos los estados</option><option value="normal">Normal</option><option value="low">Stock bajo</option><option value="out">Agotado</option></select></div>
+  <div class="tablewrap"><table class="table"><thead><tr><th>Artículo</th><th>Código</th><th>Categoría</th><th>Ubicación</th><th>Stock</th><th>Estado</th><th>Valor</th><th></th></tr></thead><tbody id="inventoryBody"></tbody></table></div></div>
+</div>
 
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border flex flex-col md:flex-row gap-4 items-center">
-                    <div class="relative flex-grow w-full">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="text" id="search-inv" placeholder="Buscar producto, SKU o categoría..." class="w-full pl-12 p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-purple-500 transition">
-                    </div>
-                    <div class="flex gap-2 w-full md:w-auto">
-                        <button onclick="filterStock('all')" class="px-4 py-3 rounded-xl bg-slate-100 text-slate-600 font-bold text-sm hover:bg-slate-200 transition">Todos</button>
-                        <button onclick="filterStock('low')" class="px-4 py-3 rounded-xl bg-red-100 text-red-600 font-bold text-sm hover:bg-red-200 transition">Stock Bajo</button>
-                        <button onclick="filterStock('high')" class="px-4 py-3 rounded-xl bg-green-100 text-green-600 font-bold text-sm hover:bg-green-200 transition">Stock Alto</button>
-                    </div>
-                </div>
+<div id="movementsPage" class="hidden"><div class="pagehead"><div><h1>Movimientos</h1><p>Entradas, salidas, ajustes y transferencias de inventario.</p></div><button class="btn primary" id="movementBtn"><i class="fa-solid fa-arrow-right-arrow-left"></i> Registrar movimiento</button></div><div class="card panel"><div class="tablewrap"><table class="table"><thead><tr><th>Fecha</th><th>Artículo</th><th>Tipo</th><th>Cantidad</th><th>Usuario</th><th>Nota</th></tr></thead><tbody id="movementBody"></tbody></table></div></div></div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-16 h-16 bg-purple-100 text-purple-700 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-box"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Productos</p><p id="inv-total" class="text-3xl font-black">0</p></div>
-                    </div>
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-triangle-exclamation"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Alertas</p><p id="inv-critical" class="text-3xl font-black">0</p></div>
-                    </div>
-                    <div class="bg-white p-8 rounded-[2rem] shadow-sm border flex items-center gap-6">
-                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-2xl flex items-center justify-center text-2xl"><i class="fas fa-check-circle"></i></div>
-                        <div><p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Estables</p><p id="inv-ok" class="text-3xl font-black">0</p></div>
-                    </div>
-                </div>
+<div id="categoriesPage" class="hidden"><div class="pagehead"><div><h1>Categorías</h1><p>Clasifica materiales clínicos, medicamentos, equipos, mobiliario y limpieza.</p></div><button class="btn primary" id="catBtn"><i class="fa-solid fa-plus"></i> Nueva categoría</button></div><div class="card panel"><div id="catCards" class="grid2"></div></div></div>
 
-                <div class="bg-white rounded-[2rem] shadow-sm border overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-slate-50 border-b border-slate-100">
-                                <tr>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Producto</th>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Stock</th>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Vencimiento</th>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider">Estado</th>
-                                    <th class="p-6 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="inventory-table-body" class="divide-y divide-slate-100"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
+<div id="locationsPage" class="hidden"><div class="pagehead"><div><h1>Ubicaciones</h1><p>Controla dónde se encuentra cada activo dentro de la clínica.</p></div><button class="btn primary" id="locBtn"><i class="fa-solid fa-plus"></i> Nueva ubicación</button></div><div class="card panel"><div id="locCards" class="grid2"></div></div></div>
 
-            <!-- Patients -->
-            <section id="sec-patients" class="section hidden space-y-10 fade-in">
-                <div class="text-center max-w-3xl mx-auto">
-                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-4">Registro de Pacientes</h2>
-                    <p class="text-slate-500 font-medium">Control de flujo clínico y demografía</p>
-                </div>
-                <div class="bg-white p-12 rounded-[3rem] shadow-xl border border-slate-100 max-w-4xl mx-auto">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
-                        <div class="space-y-6">
-                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-venus-mars text-purple-600"></i> Género</p>
-                            <div class="flex gap-4">
-                                <label class="flex-1 flex items-center justify-center gap-3 p-5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
-                                    <input type="radio" name="gender" value="M" class="w-4 h-4"> <span class="font-bold">Hombre</span>
-                                </label>
-                                <label class="flex-1 flex items-center justify-center gap-3 p-5 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-pink-600 has-[:checked]:bg-pink-50">
-                                    <input type="radio" name="gender" value="F" class="w-4 h-4"> <span class="font-bold">Mujer</span>
-                                </label>
-                            </div>
-                        </div>
-                        <div class="space-y-6">
-                            <p class="font-bold text-slate-700 flex items-center gap-3 text-lg"><i class="fas fa-user-graduate text-purple-600"></i> Etapa de Vida</p>
-                            <div class="grid grid-cols-3 gap-3">
-                                <label class="flex items-center justify-center gap-2 p-4 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
-                                    <input type="radio" name="age" value="niño" class="w-4 h-4"> <span class="text-sm font-bold">Niño</span>
-                                </label>
-                                <label class="flex items-center justify-center gap-2 p-4 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
-                                    <input type="radio" name="age" value="joven" class="w-4 h-4"> <span class="text-sm font-bold">Joven</span>
-                                </label>
-                                <label class="flex items-center justify-center gap-2 p-4 border-2 rounded-2xl cursor-pointer transition-all has-[:checked]:border-purple-600 has-[:checked]:bg-purple-50">
-                                    <input type="radio" name="age" value="adulto" class="w-4 h-4"> <span class="text-sm font-bold">Adulto</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-center gap-4 mb-12 p-8 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
-                        <input type="checkbox" id="xray-check" class="w-6 h-6 rounded text-purple-600">
-                        <label for="xray-check" class="font-bold text-slate-700 text-xl">¿Realizó Radiografía?</label>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <button id="btn-add-consulta" class="bg-purple-600 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-purple-700 transition-all transform active:scale-95 flex items-center justify-center gap-3">
-                            <i class="fas fa-stethoscope"></i> Registrar Consulta
-                        </button>
-                        <button id="btn-add-radiografia" class="bg-slate-800 text-white py-6 rounded-3xl font-black text-xl shadow-xl hover:bg-slate-900 transition-all transform active:scale-95 flex items-center justify-center gap-3">
-                            <i class="fas fa-x-ray"></i> Registrar Radiografía
-                        </button>
-                    </div>
-                </div>
-            </section>
+<div id="reportsPage" class="hidden"><div class="pagehead"><div><h1>Reportes</h1><p>Genera documentos listos para imprimir, archivar o compartir.</p></div></div><div class="grid2"><div class="card panel"><div class="panel-head"><h3>Inventario completo</h3></div><p style="color:var(--muted)">Listado de artículos, stock, ubicación, costo y estado.</p><button class="btn primary" onclick="generatePDF('full')"><i class="fa-solid fa-file-pdf"></i> Generar reporte</button></div><div class="card panel"><div class="panel-head"><h3>Alertas</h3></div><p style="color:var(--muted)">Artículos con stock bajo o agotado.</p><button class="btn" onclick="generatePDF('alerts')"><i class="fa-solid fa-triangle-exclamation"></i> Generar alertas</button></div></div></div>
+</section>
+</main>
+</div>
 
-            <!-- Stats -->
-            <section id="sec-stats" class="section hidden space-y-12 fade-in">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                    <div>
-                        <h2 class="text-4xl font-black text-slate-900 tracking-tight">Analítica Corporativa</h2>
-                        <p class="text-slate-500 font-medium">Métricas de desempeño y flujo de pacientes</p>
-                    </div>
-                    <div class="flex gap-3 bg-white p-3 rounded-2xl shadow-sm border">
-                        <select id="stats-range" class="p-3 rounded-xl bg-slate-50 outline-none font-bold text-slate-600">
-                            <option value="day">Hoy</option>
-                            <option value="week">Semana</option>
-                            <option value="month">Mes</option>
-                            <option value="all">Histórico</option>
-                        </select>
-                        <button id="btn-sync-stats" class="bg-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-purple-700 transition">Sincronizar</button>
-                    </div>
-                </div>
+<div id="itemModal" class="modal hidden"><form class="modalbox" id="itemForm"><div class="modalhead"><h2 id="modalTitle">Nuevo activo</h2><button type="button" class="iconbtn closeModal"><i class="fa-solid fa-xmark"></i></button></div><div class="modalbody"><input type="hidden" id="itemId"><div class="formgrid">
+<div class="field"><label>Nombre *</label><input id="fName" required placeholder="Ej. Resina A2"></div>
+<div class="field"><label>Código / SKU</label><input id="fSku" placeholder="IM-0001"></div>
+<div class="field"><label>Categoría *</label><select id="fCategory" required></select></div>
+<div class="field"><label>Ubicación *</label><select id="fLocation" required></select></div>
+<div class="field"><label>Marca</label><input id="fBrand"></div>
+<div class="field"><label>Unidad</label><select id="fUnit"><option>Unidad</option><option>Caja</option><option>Paquete</option><option>Frasco</option><option>Litro</option><option>Metro</option><option>Otro</option></select></div>
+<div class="field"><label>Cantidad actual *</label><input id="fQty" type="number" min="0" step="0.01" value="0" required></div>
+<div class="field"><label>Stock mínimo *</label><input id="fMin" type="number" min="0" step="0.01" value="1" required></div>
+<div class="field"><label>Costo unitario (Bs)</label><input id="fCost" type="number" min="0" step="0.01" value="0"></div>
+<div class="field"><label>Fecha de vencimiento</label><input id="fExpiry" type="date"></div>
+<div class="field full"><label>Descripción / observaciones</label><textarea id="fDesc" rows="3"></textarea></div>
+<div class="field full"><label>Fotografía</label><div class="upload"><input id="fPhoto" type="file" accept="image/*"><div id="preview"></div></div></div>
+</div></div><div class="modalfoot"><button type="button" class="btn closeModal">Cancelar</button><button class="btn primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Guardar activo</button></div></form></div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-purple-600 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Atenciones</p>
-                        <p id="stat-total" class="text-6xl font-black text-slate-900">0</p>
-                    </div>
-                    <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-pink-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Distribución</p>
-                        <p id="stat-gender" class="text-lg font-bold text-slate-800">-</p>
-                    </div>
-                    <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-yellow-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Segmentos</p>
-                        <p id="stat-age" class="text-sm font-bold text-slate-800">-</p>
-                    </div>
-                    <div class="bg-white p-10 rounded-[2.5rem] shadow-sm border-b-8 border-cyan-500 text-center">
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest mb-3">Rayos X</p>
-                        <p id="stat-xrays" class="text-6xl font-black text-cyan-600">0</p>
-                    </div>
-                </div>
+<div id="movementModal" class="modal hidden"><form class="modalbox" id="movementForm"><div class="modalhead"><h2>Registrar movimiento</h2><button type="button" class="iconbtn closeModal"><i class="fa-solid fa-xmark"></i></button></div><div class="modalbody"><div class="formgrid"><div class="field full"><label>Artículo *</label><select id="mItem" required></select></div><div class="field"><label>Tipo *</label><select id="mType"><option value="entrada">Entrada</option><option value="salida">Salida</option><option value="ajuste">Ajuste</option></select></div><div class="field"><label>Cantidad *</label><input id="mQty" type="number" min="0.01" step="0.01" required></div><div class="field full"><label>Nota</label><textarea id="mNote" rows="3" placeholder="Motivo, proveedor, responsable, etc."></textarea></div></div></div><div class="modalfoot"><button type="button" class="btn closeModal">Cancelar</button><button class="btn primary">Registrar</button></div></form></div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                    <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
-                        <h3 class="text-2xl font-black mb-8 text-slate-800">Análisis de Género</h3>
-                        <div class="h-[300px]"><canvas id="chartGender"></canvas></div>
-                    </div>
-                    <div class="bg-white p-10 rounded-[3rem] shadow-sm border">
-                        <h3 class="text-2xl font-black mb-8 text-slate-800">Volumen por Edad</h3>
-                        <div class="h-[300px]"><canvas id="chartAge"></canvas></div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
+<div id="toast" class="toast hidden"></div>
+<script>
+    
+const CONFIG={SUPABASE_URL:"https://khifepnfvvykzjmyxxdg.supabase.co",SUPABASE_ANON_KEY:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoaWZlcG5mdnZ5a3pqbXl4eGRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTI3NzUsImV4cCI6MjEwNTIyODc3NX0.KrYsIMVeUmmYU2nd43Uj0N_YdOAvb1ATj8vKMw6UwJ8",STORAGE_BUCKET:"inventory-images"};
+let sb=null, useSupabase=false, items=[], movements=[], categories=[], locations=[];
+const demoCats=[["Medicamentos e insumos","fa-pills"],["Equipos odontológicos","fa-tooth"],["Material clínico","fa-kit-medical"],["Limpieza","fa-broom"],["Mobiliario","fa-chair"],["Tecnología y cámaras","fa-camera"],["Oficina","fa-folder-open"],["Otros","fa-box"]];
+const demoLocs=["Consultorio 1","Consultorio 2","Esterilización","Recepción","Almacén","Rayos X / Imagenología","Oficina","Área de limpieza"];
 
-    <!-- PRODUCT MODAL -->
-    <div id="modal-product" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-        <div class="bg-white w-full max-w-3xl rounded-[3rem] shadow-2xl p-12 fade-in">
-            <div class="flex justify-between items-center mb-10">
-                <h3 class="text-3xl font-black text-slate-900">Registrar Material</h3>
-                <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600 text-4xl">&times;</button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div class="space-y-6">
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Nombre del Producto</label><input type="text" id="prod-name" class="w-full p-4 border rounded-2xl input-corporate"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Cantidad Inicial</label><input type="number" id="prod-qty" class="w-full p-4 border rounded-2xl input-corporate"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Stock Mínimo (Alerta)</label><input type="number" id="prod-min" value="5" class="w-full p-4 border rounded-2xl input-corporate"></div>
-                </div>
-                <div class="space-y-6">
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fecha Vencimiento (Opcional)</label><input type="date" id="prod-expiry" class="w-//p-4 border rounded-2xl input-corporate w-full"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Fotografía Corporativa</label><input type="file" id="prod-photo" class="w-full text-xs p-3 border rounded-2xl bg-slate-50"></div>
-                    <div><label class="text-xs font-bold text-slate-500 ml-1 uppercase tracking-tighter">Observaciones</label><textarea id="prod-note" class="w-full p-4 border rounded-2xl input-corporate h-20"></textarea></div>
-                </div>
-            </div>
-            <button id="btn-save-product" class="w-full mt-12 btn-corporate text-white py-5 rounded-2xl font-bold text-xl shadow-xl transition-all">Guardar en Almacén</button>
-        </div>
-    </div>
-
-    <script>
-        // =========================================================================
-        // CONFIGURACIÓN - REEMPLAZA CON TUS DATOS
-        // =========================================================================
-        const SUPABASE_URL = 'https://khifepnfvvykzjmyxxdg.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoaWZlcG5mdnZ5a3pqbXl4eGRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTI3NzUsImV4cCI6MjEwNTIyODc3NX0.KrYsIMVeUmmYU2nd43Uj0N_YdOAvb1ATj8vKMw6UwJ8';
-      
-        // =========================================================================
-
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const VALID_USER = "AdminImagina";
-        const VALID_PASS = "ImaginaRoot333";
-        let allProducts = [];
-
-        // --- CONTROL DE SESIÓN ---
-        window.onload = () => {
-            if (localStorage.getItem('dental_auth') === 'true') {
-                showApp();
-            } else {
-                document.getElementById('login-screen').classList.remove('hidden');
-            }
-        };
-
-        function showApp() {
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-screen').classList.remove('hidden');
-            initInventory();
-        }
-
-        document.getElementById('btn-login').addEventListener('click', () => {
-            const user = document.getElementById('login-user').value;
-            const pass = document.getElementById('login-pass').value;
-            if (user === VALID_USER && pass === VALID_PASS) {
-                localStorage.setItem('dental_auth', 'true');
-                showApp();
-            } else { alert("Credenciales inválidas."); }
-        });
-
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            localStorage.removeItem('dental_auth');
-            location.reload();
-        });
-
-        // --- NAVEGACIÓN ---
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const target = item.getAttribute('data-section');
-                document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-                document.getElementById(target).classList.remove('hidden');
-                document.querySelectorAll('.sidebar-item').forEach(l => { l.classList.remove('active'); l.classList.add('text-slate-400'); });
-                item.classList.add('active');
-                item.classList.remove('text-slate-400');
-                if(window.innerWidth < 768) toggleSidebar();
-            });
-        });
-
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('sidebar-collapsed');
-        }
-        document.getElementById('mobile-toggle').addEventListener('click', toggleSidebar);
-
-        // --- GESTIÓN DE MODAL ---
-        document.getElementById('btn-open-modal').addEventListener('click', () => toggleModal('modal-product'));
-        document.getElementById('btn-close-modal').addEventListener('click', () => toggleModal('modal-product'));
-        function toggleModal(id) { document.getElementById(id).classList.toggle('hidden'); }
-
-        // --- INVENTARIO ---
-        async function initInventory() {
-            const { data } = await supabaseClient.from('inventario').select('*').order('nombre');
-            allProducts = data || [];
-            renderInventory(allProducts);
-        }
-
-        function renderInventory(products) {
-            const tbody = document.getElementById('inventory-table-body');
-            let total = 0, critical = 0, ok = 0;
-            tbody.innerHTML = "";
-            products.forEach(item => {
-                total++;
-                const isLow = item.cantidad_actual <= (item.stock_minimo || 5);
-                if (isLow) critical++; else ok++;
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition-all group">
-                        <td class="p-6">
-                            <div class="flex items-center gap-4">
-                                <img src="${item.url_foto || 'https://via.placeholder.com/40'}" class="w-12 h-12 rounded-xl object-cover shadow-sm">
-                                <div class="font-bold text-slate-800">${item.nombre}</div>
-                            </div>
-                        </td>
-                        <td class="p-6">
-                            <div class="flex items-center gap-3">
-                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual - 1})" class="w-8 h-8 bg-white border rounded-lg text-red-500">-</button>
-                                <span class="font-black w-8 text-center">${item.cantidad_actual}</span>
-                                <button onclick="updateQty('${item.id}', ${item.cantidad_actual + 1})" class="w-8 h-8 bg-white border rounded-lg text-green-500">+</button>
-                            </div>
-                        </td>
-                        <td class="p-6 text-sm text-slate-500">${item.fecha_vencimiento || 'No aplica'}</td>
-                        <td class="p-6">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-black uppercase ${isLow ? 'status-critical' : 'status-stable'}">
-                                ${isLow ? 'Crítico' : 'Estable'}
-                            </span>
-                        </td>
-                        <td class="p-6 text-center">
-                            <button onclick="deleteProduct('${item.id}')" class="text-slate-300 hover:text-red-500 transition"><i class="fas fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('inv-total').innerText = total;
-            document.getElementById('inv-critical').innerText = critical;
-            document.getElementById('inv-ok').innerText = ok;
-        }
-
-        window.filterInventory = () => {
-            const term = document.getElementById('search-inv').value.toLowerCase();
-            const filtered = allProducts.filter(p => p.nombre.toLowerCase().includes(term));
-            renderInventory(filtered);
-        };
-
-        window.filterStock = (type) => {
-            if(type === 'all') renderInventory(allProducts);
-            else if(type === 'low') renderInventory(allProducts.filter(p => p.cantidad_actual <= (p.stock_minimo || 5)));
-            else if(type === 'high') renderInventory(allProducts.filter(p => p.cantidad_actual > (p.stock_minimo || 5)));
-        };
-
-        document.getElementById('btn-save-product').addEventListener('click', async () => {
-            const name = document.getElementById('prod-name').value;
-            const qty = document.getElementById('prod-qty').value;
-            const min = document.getElementById('prod-min').value;
-            const expiry = document.getElementById('prod-expiry').value;
-            const note = document.getElementById('prod-note').value;
-            const fileInput = document.getElementById('prod-photo');
-            if (!name || !qty) return alert("Nombre y cantidad son obligatorios");
-
-            let photoUrl = "";
-            if (fileInput.files[0]) {
-                const file = fileInput.files[0];
-                const safeName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-                const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('product_photos').upload(safeName, file);
-                if (!uploadError) {
-                    const { data: urlData } = supabaseClient.storage.from('product_photos').getPublicUrl(safeName);
-                    photoUrl = urlData.publicUrl;
-                } else { alert("Error subiendo imagen: " + uploadError.message); }
-            }
-
-            const { error } = await supabaseClient.from('inventario').insert([{ nombre: name, cantidad_actual: Number(qty), stock_minimo: Number(min), fecha_vencimiento: expiry, url_foto: photoUrl, notas: note }]);
-            if (error) alert("Error: " + error.message);
-            else { alert("Material Registrado"); toggleModal('modal-product'); initInventory(); }
-        });
-
-        window.updateQty = async (id, newQty) => {
-            if (newQty < 0) return;
-            await supabaseClient.from('inventario').update({ cantidad_actual: newQty }).eq('id', id);
-            initInventory();
-        };
-
-        window.deleteProduct = async (id) => {
-            if(confirm("¿Eliminar este producto?")) {
-                await supabaseClient.from('inventario').delete().eq('id', id);
-                initInventory();
-            }
-        };
-
-        // --- PACIENTES ---
-        document.getElementById('btn-add-consulta').addEventListener('click', () => addPatient('Consulta'));
-        document.getElementById('btn-add-radiografia').addEventListener('click', () => addPatient('Radiografía'));
-
-        async function addPatient(type) {
-            const gender = document.querySelector(`input[name="gender"]:checked`)?.value;
-            const age = document.querySelector(`input[name="age"]:checked`)?.value;
-            const xray = document.getElementById('xray-check').checked;
-            if (!gender || !age) return alert("Complete los datos del paciente");
-
-            const { error } = await supabaseClient.from('pacientes').insert([{ tipo_servicio: type, genero: gender, rango_edad: age, realizo_radiografia: xray }]);
-            if (error) alert("Error: " + error.message);
-            else { alert("Paciente registrado exitosamente"); document.getElementById('xray-check').checked = false; }
-        }
-
-        // --- ANALÍTICA ---
-        let chartGender, chartAge;
-        document.getElementById('btn-sync-stats').addEventListener('click', loadStats);
-
-        async function loadStats() {
-            const range = document.getElementById('stats-range').value;
-            let query = supabaseClient.from('pacientes').select('*');
-            if (range === 'day') {
-                const today = new Date().toISOString().split('T')[0];
-                query = query.gte('fecha_atencion', today);
-            }
-            const { data } = await query;
-            let total = 0, women = 0, men = 0, kids = 0, youth = 0, adults = 0, xrays = 0;
-            data?.forEach(p => {
-                total++;
-                if (p.genero === 'F') women++; else men++;
-                if (p.rango_edad === 'niño') kids++; else if (p.rango_edad === 'joven') youth++; else adults++;
-                if (p.realizo_radiografia) xrays++;
-            });
-            document.getElementById('stat-total').innerText = total;
-            document.getElementById('stat-gender').innerText = `Mujeres: ${women} | Hombres: ${men}`;
-            document.getElementById('stat-age').innerText = `Niños: ${kids} | Jóvenes: ${youth} | Adultos: ${adults}`;
-            document.getElementById('stat-xrays').innerText = xrays;
-
-            if (chartGender) chartGender.destroy();
-            chartGender = new Chart(document.getElementById('chartGender'), {
-                type: 'doughnut',
-                data: { labels: ['Mujeres', 'Hombres'], datasets: [{ data: [women, men], backgroundColor: ['#D946EF', '#3B82F6'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-            if (chartAge) chartAge.destroy();
-            chartAge = new Chart(document.getElementById('chartAge'), {
-                type: 'bar',
-                data: { labels: ['Niños', 'Jóvenes', 'Adultos'], datasets: [{ label: 'Pacientes', data: [kids, youth, adults], backgroundColor: '#8A2BE2', borderRadius: 10 }] },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        // --- PDF ---
-        document.getElementById('btn-export-pdf').addEventListener('click', () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(20);
-            doc.text("Reporte de Inventario - Clínica Dental Imagina", 14, 20);
-            doc.setFontSize(10);
-            doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 28);
-            const tableData = allProducts.map(p => [p.nombre, p.cantidad_actual, p.stock_minimo, p.fecha_vencimiento || 'No aplica']);
-            doc.autoTable({
-                startY: 35,
-                head: [['Producto', 'Cantidad', 'Stock Mínimo', 'Vencimiento']],
-                body: tableData,
-                headStyles: { fillColor: [138, 43, 226] }
-            });
-            doc.save('Inventario_Dental_Imagina.pdf');
-        });
-    </script>
+function init(){
+  useSupabase=!CONFIG.SUPABASE_URL.includes("https://khifepnfvvykzjmyxxdg.supabase.co") && !CONFIG.SUPABASE_ANON_KEY.includes("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoaWZlcG5mdnZ5a3pqbXl4eGRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2NTI3NzUsImV4cCI6MjEwNTIyODc3NX0.KrYsIMVeUmmYU2nd43Uj0N_YdOAvb1ATj8vKMw6UwJ8");
+  if(useSupabase) sb=supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_ANON_KEY);
+  if(useSupabase) sb.auth.getSession().then(({data})=>data.session?startApp(data.session.user):null);
+  else demoLogin();
+}
+function demoLogin(){document.getElementById("loginForm").addEventListener("submit",e=>{e.preventDefault();startApp({email:document.getElementById("email").value||"admin@clinicaimagina.com.bo",user_metadata:{full_name:"Administrador"}})})}
+async function startApp(user){document.getElementById("loginView").classList.add("hidden");document.getElementById("app").classList.remove("hidden");document.getElementById("userEmail").textContent=user.email||"Administrador";document.getElementById("userName").textContent=user.user_metadata?.full_name||"Administrador";document.getElementById("avatar").textContent=(user.email||"A")[0].toUpperCase();await loadData()}
+async function loadData(){
+ if(useSupabase){
+   const [i,c,l,m]=await Promise.all([sb.from("inventory_items").select("*").order("created_at",{ascending:false}),sb.from("inventory_categories").select("*").order("name"),sb.from("inventory_locations").select("*").order("name"),sb.from("inventory_movements").select("*").order("created_at",{ascending:false}).limit(100)]);
+   items=i.data||[]; categories=c.data||[]; locations=l.data||[]; movements=m.data||[];
+ }else{
+   categories=demoCats.map((x,i)=>({id:"c"+i,name:x[0],icon:x[1]}));locations=demoLocs.map((x,i)=>({id:"l"+i,name:x}));
+   items=JSON.parse(localStorage.getItem("imagina_inventory")||"[]");movements=JSON.parse(localStorage.getItem("imagina_movements")||"[]");
+ }
+ renderAll()
+}
+function saveDemo(){localStorage.setItem("imagina_inventory",JSON.stringify(items));localStorage.setItem("imagina_movements",JSON.stringify(movements))}
+function renderAll(){fillSelects();renderDashboard();renderTable();renderMovements();renderCategories();renderLocations()}
+function status(it){if(Number(it.quantity)<=0)return"out";if(Number(it.quantity)<=Number(it.min_stock))return"low";return"normal"}
+function statusLabel(s){return s==="out"?"Agotado":s==="low"?"Stock bajo":"Normal"}
+function money(v){return"Bs "+Number(v||0).toLocaleString("es-BO",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fillSelects(){
+ const opts=categories.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("");document.getElementById("fCategory").innerHTML=opts;
+ document.getElementById("catFilter").innerHTML='<option value="">Todas las categorías</option>'+opts;
+ const lo=locations.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join("");document.getElementById("fLocation").innerHTML=lo;
+ document.getElementById("mItem").innerHTML=items.map(i=>`<option value="${i.id}">${esc(i.name)} — ${i.quantity} ${esc(i.unit||"Unidad")}</option>`).join("");
+}
+function renderDashboard(){
+ const total=items.length,low=items.filter(i=>status(i)==="low").length,out=items.filter(i=>status(i)==="out").length,val=items.reduce((a,i)=>a+Number(i.quantity||0)*Number(i.cost||0),0);
+ document.getElementById("sTotal").textContent=total;document.getElementById("sLow").textContent=low;document.getElementById("sOut").textContent=out;document.getElementById("sValue").textContent=money(val);
+ const counts=categories.map(c=>({name:c.name,n:items.filter(i=>i.category_id===c.id).length})).filter(x=>x.n);const max=Math.max(1,...counts.map(x=>x.n));
+ document.getElementById("chart").innerHTML=counts.length?counts.map(x=>`<div class="barwrap"><div class="bar" style="height:${Math.max(6,x.n/max*85)}%"></div><small title="${esc(x.name)}">${esc(x.name).slice(0,9)}</small></div>`).join(""):'<div class="empty">Sin datos</div>';
+ const alerts=items.filter(i=>status(i)!=="normal").slice(0,7);document.getElementById("alerts").innerHTML=alerts.length?alerts.map(i=>`<div class="rowitem"><div class="thumb"><i class="fa-solid fa-box"></i></div><div class="meta"><b>${esc(i.name)}</b><span>${Number(i.quantity||0)} ${esc(i.unit||"unid.")} disponibles</span></div><span class="badge ${status(i)}">${statusLabel(status(i))}</span></div>`).join(""):'<div class="empty"><i class="fa-solid fa-circle-check"></i><br>Sin alertas de stock</div>';
+ const rec=movements.slice(0,6);document.getElementById("recent").innerHTML=rec.length?rec.map(m=>`<div class="rowitem"><div class="thumb"><i class="fa-solid ${m.type==="entrada"?"fa-arrow-down":"fa-arrow-up"}"></i></div><div class="meta"><b>${esc(m.item_name||items.find(i=>i.id===m.item_id)?.name||"Artículo")}</b><span>${new Date(m.created_at||Date.now()).toLocaleString("es-BO")}</span></div><span class="badge ${m.type==="entrada"?"ok":"low"}">${esc(m.type)} · ${m.quantity}</span></div>`).join(""):'<div class="empty">Aún no hay movimientos</div>';
+}
+function renderTable(){
+ const q=(document.getElementById("tableSearch")?.value||document.getElementById("globalSearch").value||"").toLowerCase(),cat=document.getElementById("catFilter").value,st=document.getElementById("statusFilter").value;
+ const data=items.filter(i=>(!q||[i.name,i.sku,i.brand].join(" ").toLowerCase().includes(q))&&(!cat||i.category_id===cat)&&(!st||status(i)===st));
+ document.getElementById("inventoryBody").innerHTML=data.length?data.map(i=>{const c=categories.find(x=>x.id===i.category_id),l=locations.find(x=>x.id===i.location_id);return`<tr><td><div class="itemcell">${i.photo_url?`<img class="itemphoto" src="${i.photo_url}">`:'<div class="itemphoto"><i class="fa-solid fa-box"></i></div>'}<div><b>${esc(i.name)}</b><div style="color:var(--muted);font-size:10px">${esc(i.brand||"Sin marca")}</div></div></div></td><td>${esc(i.sku||"—")}</td><td>${esc(c?.name||"—")}</td><td>${esc(l?.name||"—")}</td><td><b>${Number(i.quantity||0)}</b> ${esc(i.unit||"")}</td><td><span class="badge ${status(i)}">${statusLabel(status(i))}</span></td><td>${money(Number(i.quantity||0)*Number(i.cost||0))}</td><td class="actions-cell"><button class="mini" onclick="editItem('${i.id}')" title="Editar"><i class="fa-solid fa-pen"></i></button><button class="mini" onclick="deleteItem('${i.id}')" title="Eliminar"><i class="fa-solid fa-trash"></i></button></td></tr>`}).join(""):'<tr><td colspan="8"><div class="empty"><i class="fa-solid fa-box-open"></i><br>No se encontraron artículos.</div></td></tr>';
+}
+function renderMovements(){document.getElementById("movementBody").innerHTML=movements.length?movements.map(m=>`<tr><td>${new Date(m.created_at||Date.now()).toLocaleString("es-BO")}</td><td>${esc(m.item_name||items.find(i=>i.id===m.item_id)?.name||"—")}</td><td><span class="badge ${m.type==="entrada"?"ok":m.type==="salida"?"low":"out"}">${esc(m.type)}</span></td><td>${m.quantity}</td><td>${esc(m.user_email||"Administrador")}</td><td>${esc(m.note||"—")}</td></tr>`).join(""):'<tr><td colspan="6"><div class="empty">No hay movimientos registrados.</div></td></tr>'}
+function renderCategories(){document.getElementById("catCards").innerHTML=categories.map(c=>`<div class="card panel"><div class="panel-head"><h3><i class="fa-solid ${c.icon||"fa-layer-group"}" style="color:var(--p);margin-right:8px"></i>${esc(c.name)}</h3><span>${items.filter(i=>i.category_id===c.id).length} artículos</span></div></div>`).join("")}
+function renderLocations(){document.getElementById("locCards").innerHTML=locations.map(l=>`<div class="card panel"><div class="panel-head"><h3><i class="fa-solid fa-location-dot" style="color:var(--p);margin-right:8px"></i>${esc(l.name)}</h3><span>${items.filter(i=>i.location_id===l.id).length} artículos</span></div></div>`).join("")}
+function openItem(id=null){document.getElementById("itemModal").classList.remove("hidden");document.getElementById("modalTitle").textContent=id?"Editar activo":"Nuevo activo";document.getElementById("itemId").value=id||"";document.getElementById("preview").innerHTML="";const i=items.find(x=>x.id===id);["fName","fSku","fBrand","fQty","fMin","fCost","fExpiry","fDesc"].forEach(x=>document.getElementById(x).value=i?({"fName":i.name,fSku:i.sku||"",fBrand:i.brand||"",fQty:i.quantity,fMin:i.min_stock,fCost:i.cost||0,fExpiry:i.expiry_date||"",fDesc:i.description||""}[x]):"");if(i){document.getElementById("fCategory").value=i.category_id;document.getElementById("fLocation").value=i.location_id;document.getElementById("fUnit").value=i.unit||"Unidad";if(i.photo_url)document.getElementById("preview").innerHTML=`<img src="${i.photo_url}">`}}
+async function saveItem(e){e.preventDefault();const id=document.getElementById("itemId").value||crypto.randomUUID(),old=items.find(x=>x.id===id);let photo=old?.photo_url||null;const file=document.getElementById("fPhoto").files[0];
+ if(file&&useSupabase){const path=`${id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g,"_")}`;const up=await sb.storage.from(CONFIG.STORAGE_BUCKET).upload(path,file,{upsert:true});if(!up.error)photo=sb.storage.from(CONFIG.STORAGE_BUCKET).getPublicUrl(path).data.publicUrl}
+ else if(file){photo=URL.createObjectURL(file)}
+ const obj={id,name:document.getElementById("fName").value.trim(),sku:document.getElementById("fSku").value.trim(),category_id:document.getElementById("fCategory").value,location_id:document.getElementById("fLocation").value,brand:document.getElementById("fBrand").value.trim(),unit:document.getElementById("fUnit").value,quantity:Number(document.getElementById("fQty").value),min_stock:Number(document.getElementById("fMin").value),cost:Number(document.getElementById("fCost").value||0),expiry_date:document.getElementById("fExpiry").value||null,description:document.getElementById("fDesc").value.trim(),photo_url:photo,updated_at:new Date().toISOString(),created_at:old?.created_at||new Date().toISOString()};
+ if(useSupabase){const {error}=await sb.from("inventory_items").upsert(obj);if(error)return toast(error.message)}else{const n=items.findIndex(x=>x.id===id);n>=0?items[n]=obj:items.unshift(obj);saveDemo()}
+ document.getElementById("itemModal").classList.add("hidden");await loadData();toast("Activo guardado correctamente")}
+async function deleteItem(id){if(!confirm("¿Eliminar este activo del inventario?"))return;if(useSupabase){const {error}=await sb.from("inventory_items").delete().eq("id",id);if(error)return toast(error.message)}else{items=items.filter(x=>x.id!==id);saveDemo()}await loadData();toast("Activo eliminado")}
+function editItem(id){openItem(id)}
+async function saveMovement(e){e.preventDefault();const item=items.find(x=>x.id===document.getElementById("mItem").value);if(!item)return;const type=document.getElementById("mType").value,q=Number(document.getElementById("mQty").value);if(type==="salida"&&q>Number(item.quantity))return toast("La salida supera el stock disponible.");let newQ=type==="entrada"?Number(item.quantity)+q:type==="salida"?Number(item.quantity)-q:q;
+ if(useSupabase){const {error}=await sb.from("inventory_items").update({quantity:newQ,updated_at:new Date().toISOString()}).eq("id",item.id);if(error)return toast(error.message);await sb.from("inventory_movements").insert({item_id:item.id,item_name:item.name,type,quantity:q,note:document.getElementById("mNote").value,user_email:document.getElementById("userEmail").textContent})}else{item.quantity=newQ;movements.unshift({id:crypto.randomUUID(),item_id:item.id,item_name:item.name,type,quantity:q,note:document.getElementById("mNote").value,user_email:"Administrador",created_at:new Date().toISOString()});saveDemo()}
+ document.getElementById("movementModal").classList.add("hidden");e.target.reset();await loadData();toast("Movimiento registrado")}
+function generatePDF(mode="full"){const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:"landscape"});doc.setFillColor(108,59,140);doc.rect(0,0,297,22,"F");doc.setTextColor(255,255,255);doc.setFontSize(16);doc.text("IMAGINA · CONTROL DE INVENTARIO",14,14);doc.setFontSize(9);doc.text(new Date().toLocaleString("es-BO"),225,14);doc.setTextColor(40,35,45);const data=(mode==="alerts"?items.filter(i=>status(i)!=="normal"):items);doc.autoTable({startY:31,head:[["Artículo","Código","Categoría","Ubicación","Stock","Estado","Valor"]],body:data.map(i=>[i.name,i.sku||"—",categories.find(c=>c.id===i.category_id)?.name||"—",locations.find(l=>l.id===i.location_id)?.name||"—",`${i.quantity} ${i.unit||""}`,statusLabel(status(i)),money(i.quantity*i.cost)]),styles:{fontSize:8,cellPadding:3},headStyles:{fillColor:[108,59,140]}});doc.save(`inventario-imagina-${new Date().toISOString().slice(0,10)}.pdf`)}
+function exportCSV(){const head=["Nombre","SKU","Categoría","Ubicación","Marca","Unidad","Cantidad","Mínimo","Costo Bs","Vencimiento","Estado"];const rows=items.map(i=>[i.name,i.sku||"",categories.find(c=>c.id===i.category_id)?.name||"",locations.find(l=>l.id===i.location_id)?.name||"",i.brand||"",i.unit||"",i.quantity,i.min_stock,i.cost||0,i.expiry_date||"",statusLabel(status(i))]);const csv=[head,...rows].map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(",")).join("\\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"}));a.download="inventario-imagina.csv";a.click()}
+function toast(t){const x=document.getElementById("toast");x.textContent=t;x.classList.remove("hidden");setTimeout(()=>x.classList.add("hidden"),2800)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+document.querySelectorAll(".nav button[data-page]").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["dashboard","inventory","movements","categories","locations","reports"].forEach(p=>document.getElementById(p+"Page").classList.toggle("hidden",p!==b.dataset.page))});
+document.getElementById("quickAdd").onclick=()=>openItem();document.getElementById("addBtn").onclick=()=>openItem();document.getElementById("movementBtn").onclick=()=>document.getElementById("movementModal").classList.remove("hidden");document.getElementById("pdfBtn").onclick=()=>generatePDF();document.getElementById("exportCsv").onclick=exportCSV;
+document.getElementById("refresh").onclick=loadData;document.getElementById("globalSearch").oninput=renderTable;document.getElementById("tableSearch").oninput=renderTable;document.getElementById("catFilter").onchange=renderTable;document.getElementById("statusFilter").onchange=renderTable;
+document.getElementById("itemForm").onsubmit=saveItem;document.getElementById("movementForm").onsubmit=saveMovement;
+document.querySelectorAll(".closeModal").forEach(b=>b.onclick=()=>b.closest(".modal").classList.add("hidden"));
+document.getElementById("fPhoto").onchange=e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=()=>document.getElementById("preview").innerHTML=`<img src="${r.result}">`;r.readAsDataURL(f)}};
+document.getElementById("logout").onclick=async()=>{if(useSupabase)await sb.auth.signOut();location.reload()};
+document.getElementById("catBtn").onclick=()=>{const n=prompt("Nombre de la categoría");if(!n)return;if(useSupabase)sb.from("inventory_categories").insert({name:n}).then(loadData);else{categories.push({id:crypto.randomUUID(),name:n,icon:"fa-layer-group"});saveDemo();renderAll()}};
+document.getElementById("locBtn").onclick=()=>{const n=prompt("Nombre de la ubicación");if(!n)return;if(useSupabase)sb.from("inventory_locations").insert({name:n}).then(loadData);else{locations.push({id:crypto.randomUUID(),name:n});saveDemo();renderAll()}};
+init();
+</script>
 </body>
 </html>
